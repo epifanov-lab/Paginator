@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  * @author Konstantin Epifanov
  * @since 24.06.2019
  */
-public class ItemView extends RelativeLayout implements Consumer<DataService.Content> {
+public class ItemView extends RelativeLayout implements Consumer<Item>, Runnable {
 
   /** The default attr resource. */
   @AttrRes
@@ -33,7 +33,7 @@ public class ItemView extends RelativeLayout implements Consumer<DataService.Con
   private static final int[] DEFAULT_STYLEABLE = new int[0];
 
   private ViewGroup mContainerItem;
-  private TextView mContent;
+  private TextView mTextView;
 
   public ItemView(Context context) {
     this(context, null);
@@ -56,19 +56,27 @@ public class ItemView extends RelativeLayout implements Consumer<DataService.Con
     } finally {
       attributes.recycle();
     }
+
+    System.out.println("INITIAL ItemView.ItemView: " + this.hashCode());
   }
 
   @Override
   protected void onFinishInflate() {
     super.onFinishInflate();
     mContainerItem = findViewById(R.id.container_item);
-    mContent = findViewById(R.id.content);
+    mTextView = findViewById(R.id.text_item);
   }
 
   @Override
-  public void accept(DataService.Content content) {
-    //System.out.println("item.accept: " + content);
-    mContent.setText(content.getText());
-    mContent.setBackgroundColor(content.getColor());
+  public void accept(Item item) {
+    //System.out.println("ItemView.accept: " + hashCode() + " || item: " + item.getId());
+    mTextView.setText(item.getText());
+    mTextView.setBackgroundColor(item.getColor());
   }
+
+  @Override
+  public void run() {
+    //System.out.println("ItemView.onUnbind: " + this.hashCode());
+  }
+
 }

@@ -20,23 +20,46 @@ public class SamplePresenter implements Disposable {
   /** Disposable. */
   private final Disposable mDisposable;
 
+  /** Data Service. */
+  private final DataService mDataService;
+
   /** Default constructor. */
-  SamplePresenter(@NonNull SampleActivity view, @NonNull DataService service) {
+  SamplePresenter(@NonNull SampleActivity view) {
 
-    final Executor fetch = Runnable::run, notify = new Handler()::post;
+    mDataService = new DataService();
 
-    final Paginator<DataService.Content> paginator = new Paginator<>(fetch, notify, Constants.PAGE_SIZE,
-      (offset, size, callback) -> service.load(offset, size).subscribe(callback));
+    final Executor fetch = Runnable::run,
+      notify = new Handler()::post;
+
+    final Paginator<Item> paginator = new Paginator<>(fetch, notify, Constants.PAGE_SIZE,
+      (offset, size, callback) -> mDataService.load(offset, size).subscribe(callback));
 
     mDisposable = Disposables.composite(
       paginator,
+
       Flux.merge(Flux.just(new Object()), view.mFluxRefresh)
         .doOnNext(o -> view.showLoadingIndicator(true))
-        .map(v -> view.getCurrentRecyclerTopPosition())
+        .map(v -> Math.max(view.getCurrentRecyclerTopPosition(), 0))
         .switchMap(paginator::apply)
         .publishOn(Schedulers.fromExecutor(view::runOnUiThread))
         .doOnNext(o -> view.showLoadingIndicator(false))
-        .subscribe(view::submitList)
+        .subscribe(view::submitList),
+
+      view.mFluxRestart
+        .doOnNext(o -> view.restart())
+        .subscribe(),
+
+      view.mFluxAdd
+        .doOnNext(o -> mDataService.addItem())
+        .subscribe(),
+
+      view.mFluxDelete
+        .doOnNext(o -> mDataService.deleteItem())
+        .subscribe(),
+
+      view.mFluxChange
+        .doOnNext(o -> mDataService.changeItem())
+        .subscribe()
     );
   }
 

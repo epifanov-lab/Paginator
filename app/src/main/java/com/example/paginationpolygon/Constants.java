@@ -6,8 +6,8 @@ package com.example.paginationpolygon;
  */
 public class Constants {
 
-  public static final int API_DELAY = 1000;
-  public static final int ITEMS_TOTAL_SIZE = 200;
+  public static final int API_DELAY = 500;
+  public static final int ITEMS_TOTAL_SIZE = 100;
   public static final int PAGE_SIZE = 10;
 
 }

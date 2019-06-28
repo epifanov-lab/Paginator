@@ -46,6 +46,115 @@ public class Paginator<T> implements Disposable, Function<Integer, Mono<PagedLis
     mLoader = load;
   }
 
+  /**
+   * @param list some paged list instance
+   * @param <V>  type of paged list items
+   *
+   * @return disposable wrapper over paged list
+   */
+  @NonNull
+  private static <V> Disposable toDisposable(@NonNull PagedList<V> list) {
+    final DataSource<?, V> dataSource = list.getDataSource();
+    return new Disposable() {
+      @Override
+      public final void dispose() {
+        dataSource.invalidate();
+      }
+
+      @Override
+      public final boolean isDisposed() {
+        return dataSource.isInvalid();
+      }
+    };
+  }
+
+  /**
+   * @param load  load function
+   * @param items initial items
+   * @param <T>   items type
+   *
+   * @return data source instance
+   */
+  @NonNull
+  private static <T> DataSource<Integer, T> newDataSource(@NonNull Paginator.Loader<T> load, @NonNull T[] items) {
+    //System.out.println("Paginator.newDataSource " + "items = [" + items.length + "]");
+
+    return new PositionalDataSource<T>() {
+      private final Disposable.Composite composite = Disposables.composite();
+
+      {
+        addInvalidatedCallback(new InvalidatedCallback() {
+          @Override
+          public final void onInvalidated() {
+            removeInvalidatedCallback(this);
+            composite.dispose();
+            //System.out.println("Paginator.onInvalidated: DISPOSE");
+          }
+        });
+      }
+
+      @Override
+      public final void loadInitial(@NonNull LoadInitialParams params, @NonNull LoadInitialCallback<T> callback) {
+        //System.out.println("Paginator.loadInitial " + "params = [" + params.requestedStartPosition + "]" + ", initial size: " + items.length);
+        callback.onResult(Arrays.asList(items), params.requestedStartPosition);
+      }
+
+      @Override
+      public final void loadRange(@NonNull LoadRangeParams params, @NonNull LoadRangeCallback<T> callback) {
+        //System.out.println("Paginator.loadRange " + "params = [pos: " + params.startPosition + " ,size " + params.loadSize + "]");
+
+        composite.add(
+          load.load(params.startPosition, params.loadSize,
+            array -> {
+              //System.out.println(" === composite.update load: pos " + params.startPosition + " , requested size " + params.loadSize + " , loaded size: " + array.length);
+              callback.onResult(Arrays.asList(array));
+            })
+        );
+      }
+    };
+  }
+
+  /**
+   * @param page    page size
+   * @param initial initial size
+   *
+   * @return paged list configuration
+   */
+  @NonNull
+  private static PagedList.Config newPagedConfig(int page, int initial) {
+    //System.out.println("Paginator.newPagedConfig " + "page = [" + page + "], initial = [" + initial + "]");
+
+    return new PagedList.Config.Builder()
+      .setEnablePlaceholders(false)
+      .setPageSize(page)
+      .setPrefetchDistance(page)
+      .setInitialLoadSizeHint(initial)
+      .build();
+  }
+
+  /**
+   * @param fetch    fetch executor
+   * @param notify   notify executor
+   * @param pageSize page size
+   * @param load     load function
+   * @param offset   offset loaded items
+   * @param items    loaded items array
+   * @param <T>      type of items
+   *
+   * @return new created paged list
+   */
+  @NonNull
+  private static <T> PagedList<T> newPagedList(@NonNull Executor fetch, @NonNull Executor notify, int pageSize,
+                                               @NonNull Paginator.Loader<T> load, int offset, @NonNull T[] items) {
+    //System.out.println("Paginator.newPagedList " + "pagesize = [" + pageSize + "], offset = [" + offset + "], items = [" + items.length + "]");
+
+    return new PagedList.Builder<>(newDataSource(load, items), newPagedConfig(pageSize, items.length))
+      .setFetchExecutor(fetch)
+      .setNotifyExecutor(notify)
+      .setInitialKey(offset)
+      .build();
+  }
+
   /** {@inheritDoc} */
   @Override
   public final void dispose() {
@@ -74,114 +183,6 @@ public class Paginator<T> implements Disposable, Function<Integer, Mono<PagedLis
       mSwap.update(toDisposable(result));
       return result;
     });
-  }
-
-  /**
-   * @param list some paged list instance
-   * @param <V>  type of paged list items
-   *
-   * @return disposable wrapper over paged list
-   */
-  @NonNull
-  private static <V> Disposable toDisposable(@NonNull PagedList<V> list) {
-    final DataSource<?, V> dataSource = list.getDataSource();
-    return new Disposable() {
-      @Override
-      public final void dispose() {
-        dataSource.invalidate();
-      }
-      @Override
-      public final boolean isDisposed() {
-        return dataSource.isInvalid();
-      }
-    };
-  }
-
-  /**
-   * @param load  load function
-   * @param items initial items
-   * @param <T>   items type
-   *
-   * @return data source instance
-   */
-  @NonNull
-  private static <T> DataSource<Integer, T> newDataSource(@NonNull Paginator.Loader<T> load, @NonNull T[] items) {
-    System.out.println("Paginator.newDataSource " + "items = [" + items.length + "]");
-
-    return new PositionalDataSource<T>() {
-      private final Disposable.Composite composite = Disposables.composite();
-
-      {
-        addInvalidatedCallback(new InvalidatedCallback() {
-          @Override
-          public final void onInvalidated() {
-            removeInvalidatedCallback(this);
-            composite.dispose();
-            System.out.println("Paginator.onInvalidated: DISPOSE");
-          }
-        });
-      }
-
-      @Override
-      public final void loadInitial(@NonNull LoadInitialParams params, @NonNull LoadInitialCallback<T> callback) {
-        System.out.println("Paginator.loadInitial " + "params = [" + params.requestedStartPosition + "]" + ", initial size: " + items.length);
-        callback.onResult(Arrays.asList(items), params.requestedStartPosition);
-      }
-
-      @Override
-      public final void loadRange(@NonNull LoadRangeParams params, @NonNull LoadRangeCallback<T> callback) {
-        System.out.println("Paginator.loadRange " + "params = [pos: " + params.startPosition + " ,size " + params.loadSize + "]");
-
-        composite.add(
-          load.load(params.startPosition, params.loadSize,
-            array -> {
-              System.out.println(" === composite.update load: pos " + params.startPosition + " , requested size " + params.loadSize + " , loaded size: " + array.length);
-              callback.onResult(Arrays.asList(array));
-            })
-        );
-      }
-    };
-  }
-
-  /**
-   * @param page    page size
-   * @param initial initial size
-   *
-   * @return paged list configuration
-   */
-  @NonNull
-  private static PagedList.Config newPagedConfig(int page, int initial) {
-    System.out.println("Paginator.newPagedConfig " + "page = [" + page + "], initial = [" + initial + "]");
-
-    return new PagedList.Config.Builder()
-      .setEnablePlaceholders(false)
-      .setPageSize(page)
-      .setPrefetchDistance(page)
-      .setInitialLoadSizeHint(initial)
-      .build();
-  }
-
-  /**
-   * @param fetch    fetch executor
-   * @param notify   notify executor
-   * @param pageSize page size
-   * @param load     load function
-   * @param offset   offset loaded items
-   * @param items    loaded items array
-   * @param <T>      type of items
-   *
-   * @return new created paged list
-   */
-  @NonNull
-  private static <T> PagedList<T> newPagedList(@NonNull Executor fetch, @NonNull Executor notify, int pageSize,
-                                               @NonNull Paginator.Loader<T> load, int offset, @NonNull T[] items) {
-    System.out.println("Paginator.newPagedList " + "pagesize = [" + pageSize + "], offset = [" + offset + "], items = [" + items.length + "]");
-
-    return new PagedList.Builder<>(newDataSource(load, items), newPagedConfig(pageSize, items.length))
-      .setFetchExecutor(fetch)
-      .setNotifyExecutor(notify)
-      .setInitialKey(offset)
-      .build();
   }
 
   /**

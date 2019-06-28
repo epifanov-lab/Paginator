@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -61,14 +62,25 @@ public class Utils {
           @Override
           public final boolean
           areItemsTheSame(T oldItem, T newItem) {
-            return oldItem.hashCode() == newItem.hashCode();
+            //System.out.println("areItemsTheSame: " + "oldItem = [" + oldItem + "], newItem = [" + newItem + "]");
+            boolean result = oldItem.hashCode() == newItem.hashCode();
+            return result;
           }
 
           @SuppressWarnings("NullableProblems")
           @Override
           public final boolean
           areContentsTheSame(T oldItem, T newItem) {
-            return Objects.equals(oldItem, newItem);
+            //System.out.println("areContentsTheSame: " + "oldItem = [" + oldItem + "], newItem = [" + newItem + "]");
+            boolean result = Objects.equals(oldItem, newItem);
+            return result;
+          }
+
+          @Nullable
+          @Override
+          public Object getChangePayload(@NonNull T oldItem, @NonNull T newItem) {
+            //System.out.println("getChangePayload: oldItem = [" + oldItem + "], newItem = [" + newItem + "]");
+            return newItem;
           }
         }).setBackgroundThreadExecutor(Runnable::run)
         .build()
@@ -82,6 +94,17 @@ public class Utils {
       public final RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
         return new RecyclerView.ViewHolder(inflater.inflate(type, parent, false)) {
         };
+      }
+
+      @Override
+      public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if (payloads.isEmpty()) onBindViewHolder(holder, position);
+        else {
+          final Consumer<T> view = ((Consumer<T>) holder.itemView);
+          payloads.forEach(item -> view.accept((T) item));
+        }
+
+        //((Consumer<T>) holder.itemView).accept(getItem(position));
       }
 
       @SuppressWarnings({"unchecked", "NullableProblems"})
@@ -98,19 +121,15 @@ public class Utils {
       @Nullable
       @Override
       protected T getItem(int position) {
-        return super.getItem(position); //todo start point
+        return super.getItem(position);
+      }
+
+      @Override
+      public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+        ((Runnable) holder.itemView).run();
+        super.onViewRecycled(holder);
       }
     };
   }
-
-  /*if (size == Constants.INITIAL_PAGE_SIZE) {
-      isCeiling = offset == 0;
-      System.out.println("CEILING  " + isCeiling + offset + " " + size);
-    }
-    */
-  /*.filter(contents -> {
-        System.out.println("content.length: " + contents.length + " , isCeiling: " + isCeiling);
-        return contents.length > 0 || isCeiling;
-      })*/
 
 }
