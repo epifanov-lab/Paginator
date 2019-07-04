@@ -1,8 +1,11 @@
-package com.example.paginationpolygon;
+package com.example.paginationpolygon.pagination;
 
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
+
+import com.example.paginationpolygon.Constants;
+import com.example.paginationpolygon.DataService;
 
 import java.util.concurrent.Executor;
 
@@ -15,7 +18,7 @@ import reactor.core.scheduler.Schedulers;
  * @author Konstantin Epifanov
  * @since 25.06.2019
  */
-public class SamplePresenter implements Disposable {
+public class PaginationPresenter implements Disposable {
 
   /** Disposable. */
   private final Disposable mDisposable;
@@ -24,14 +27,14 @@ public class SamplePresenter implements Disposable {
   private final DataService mDataService;
 
   /** Default constructor. */
-  SamplePresenter(@NonNull SampleActivity view) {
+  PaginationPresenter(@NonNull PaginationActivity view) {
 
     mDataService = new DataService();
 
     final Executor fetch = Runnable::run,
       notify = new Handler()::post;
 
-    final Paginator<Item> paginator = new Paginator<>(fetch, notify, Constants.PAGE_SIZE,
+    final NonCachedPaginator<Item> paginator = new NonCachedPaginator<>(fetch, notify, Constants.PAGE_SIZE,
       (offset, size, callback) -> mDataService.load(offset, size).subscribe(callback));
 
     mDisposable = Disposables.composite(

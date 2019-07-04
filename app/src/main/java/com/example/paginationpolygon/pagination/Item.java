@@ -1,4 +1,4 @@
-package com.example.paginationpolygon;
+package com.example.paginationpolygon.pagination;
 
 import android.graphics.Color;
 

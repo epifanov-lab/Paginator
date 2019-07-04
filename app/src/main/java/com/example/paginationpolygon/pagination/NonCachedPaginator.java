@@ -1,4 +1,4 @@
-package com.example.paginationpolygon;
+package com.example.paginationpolygon.pagination;
 
 import androidx.annotation.NonNull;
 import androidx.paging.DataSource;
@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
  * @author Konstantin Epifanov
  * @since 25.06.2019
  */
-public class Paginator<T> implements Disposable, Function<Integer, Mono<PagedList<T>>> {
+public class NonCachedPaginator<T> implements Disposable, Function<Integer, Mono<PagedList<T>>> {
 
   /** Executors. */
   private final Executor mFetch, mNotify;
@@ -38,8 +38,8 @@ public class Paginator<T> implements Disposable, Function<Integer, Mono<PagedLis
    * @param page   paging page size
    * @param load   load async function
    */
-  public Paginator(@NonNull Executor fetch, @NonNull Executor notify,
-                   int page, @NonNull Loader<T> load) {
+  public NonCachedPaginator(@NonNull Executor fetch, @NonNull Executor notify,
+                            int page, @NonNull Loader<T> load) {
     mFetch = fetch;
     mNotify = notify;
     mPageSize = page;
@@ -76,8 +76,8 @@ public class Paginator<T> implements Disposable, Function<Integer, Mono<PagedLis
    * @return data source instance
    */
   @NonNull
-  private static <T> DataSource<Integer, T> newDataSource(@NonNull Paginator.Loader<T> load, @NonNull T[] items) {
-    //System.out.println("Paginator.newDataSource " + "items = [" + items.length + "]");
+  private static <T> DataSource<Integer, T> newDataSource(@NonNull NonCachedPaginator.Loader<T> load, @NonNull T[] items) {
+    //System.out.println("NonCachedPaginator.newDataSource " + "items = [" + items.length + "]");
 
     return new PositionalDataSource<T>() {
       private final Disposable.Composite composite = Disposables.composite();
@@ -88,20 +88,20 @@ public class Paginator<T> implements Disposable, Function<Integer, Mono<PagedLis
           public final void onInvalidated() {
             removeInvalidatedCallback(this);
             composite.dispose();
-            //System.out.println("Paginator.onInvalidated: DISPOSE");
+            //System.out.println("NonCachedPaginator.onInvalidated: DISPOSE");
           }
         });
       }
 
       @Override
       public final void loadInitial(@NonNull LoadInitialParams params, @NonNull LoadInitialCallback<T> callback) {
-        //System.out.println("Paginator.loadInitial " + "params = [" + params.requestedStartPosition + "]" + ", initial size: " + items.length);
+        //System.out.println("NonCachedPaginator.loadInitial " + "params = [" + params.requestedStartPosition + "]" + ", initial size: " + items.length);
         callback.onResult(Arrays.asList(items), params.requestedStartPosition);
       }
 
       @Override
       public final void loadRange(@NonNull LoadRangeParams params, @NonNull LoadRangeCallback<T> callback) {
-        //System.out.println("Paginator.loadRange " + "params = [pos: " + params.startPosition + " ,size " + params.loadSize + "]");
+        //System.out.println("NonCachedPaginator.loadRange " + "params = [pos: " + params.startPosition + " ,size " + params.loadSize + "]");
 
         composite.add(
           load.load(params.startPosition, params.loadSize,
@@ -122,7 +122,7 @@ public class Paginator<T> implements Disposable, Function<Integer, Mono<PagedLis
    */
   @NonNull
   private static PagedList.Config newPagedConfig(int page, int initial) {
-    //System.out.println("Paginator.newPagedConfig " + "page = [" + page + "], initial = [" + initial + "]");
+    //System.out.println("NonCachedPaginator.newPagedConfig " + "page = [" + page + "], initial = [" + initial + "]");
 
     return new PagedList.Config.Builder()
       .setEnablePlaceholders(false)
@@ -145,8 +145,8 @@ public class Paginator<T> implements Disposable, Function<Integer, Mono<PagedLis
    */
   @NonNull
   private static <T> PagedList<T> newPagedList(@NonNull Executor fetch, @NonNull Executor notify, int pageSize,
-                                               @NonNull Paginator.Loader<T> load, int offset, @NonNull T[] items) {
-    //System.out.println("Paginator.newPagedList " + "pagesize = [" + pageSize + "], offset = [" + offset + "], items = [" + items.length + "]");
+                                               @NonNull NonCachedPaginator.Loader<T> load, int offset, @NonNull T[] items) {
+    //System.out.println("NonCachedPaginator.newPagedList " + "pagesize = [" + pageSize + "], offset = [" + offset + "], items = [" + items.length + "]");
 
     return new PagedList.Builder<>(newDataSource(load, items), newPagedConfig(pageSize, items.length))
       .setFetchExecutor(fetch)
@@ -171,7 +171,7 @@ public class Paginator<T> implements Disposable, Function<Integer, Mono<PagedLis
   @Override
   @NonNull
   public final Mono<PagedList<T>> apply(@NonNull Integer offset) {
-    System.out.println("Paginator.apply: " + offset);
+    System.out.println("NonCachedPaginator.apply: " + offset);
 
     final Mono<T[]> mono = Mono.create(sink -> {
       Disposable load = mLoader.load(offset, mPageSize, sink::success);

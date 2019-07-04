@@ -32,4 +32,7 @@ dependencies {
     api 'io.projectreactor.addons:reactor-extra:' + project.properties['version.reactor.extra']
     api 'androidx.paging:paging-runtime:' + project.properties['version.paging']
 
+    api 'com.google.android.exoplayer:exoplayer-core:' + project.properties['version.exoplayer']
+    api 'com.google.android.exoplayer:exoplayer-ui:'+ project.properties['version.exoplayer']
+    api 'com.google.android.exoplayer:exoplayer-hls:'+ project.properties['version.exoplayer']
 }

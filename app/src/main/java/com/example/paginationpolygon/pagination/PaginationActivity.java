@@ -1,34 +1,35 @@
-package com.example.paginationpolygon;
+package com.example.paginationpolygon.pagination;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
+import com.example.paginationpolygon.R;
+import com.example.paginationpolygon.utills.Utils;
 
 import reactor.core.publisher.Flux;
 
-import static com.example.paginationpolygon.Utils.toFlux;
+import static com.example.paginationpolygon.utills.Utils.toFlux;
 import static java.util.Objects.requireNonNull;
 
 
-public class SampleActivity extends AppCompatActivity {
+public class PaginationActivity extends AppCompatActivity {
 
-  private static final int ITEM_LAYOUT = R.layout.item_1;
+  private static final int ITEM_LAYOUT = R.layout.item_pagination;
+
   public Flux<View> mFluxRefresh, mFluxRestart;
   public Flux<View> mFluxAdd, mFluxDelete, mFluxChange;
+
   private RecyclerView mRecycler;
   private View mProgress;
-  private SamplePresenter mPresenter;
+  private PaginationPresenter mPresenter;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +57,7 @@ public class SampleActivity extends AppCompatActivity {
     mRecycler.setItemViewCacheSize(0);
     //mRecycler.setItemAnimator(null);
 
-    mPresenter = new SamplePresenter(this);
+    mPresenter = new PaginationPresenter(this);
 
   }
 

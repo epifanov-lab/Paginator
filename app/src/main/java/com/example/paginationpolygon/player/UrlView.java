@@ -1,4 +1,4 @@
-package com.example.paginationpolygon;
+package com.example.paginationpolygon.player;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -12,13 +12,16 @@ import androidx.annotation.AttrRes;
 import androidx.annotation.StyleRes;
 import androidx.annotation.StyleableRes;
 
+import com.example.paginationpolygon.R;
+import com.example.paginationpolygon.pagination.Item;
+
 import java.util.function.Consumer;
 
 /**
  * @author Konstantin Epifanov
  * @since 24.06.2019
  */
-public class ItemView extends RelativeLayout implements Consumer<Item>, Runnable {
+public class UrlView extends RelativeLayout implements Consumer<String> {
 
   /** The default attr resource. */
   @AttrRes
@@ -32,22 +35,21 @@ public class ItemView extends RelativeLayout implements Consumer<Item>, Runnable
   @StyleableRes
   private static final int[] DEFAULT_STYLEABLE = new int[0];
 
-  private ViewGroup mContainerItem;
   private TextView mTextView;
 
-  public ItemView(Context context) {
+  public UrlView(Context context) {
     this(context, null);
   }
 
-  public ItemView(Context context, AttributeSet attrs) {
+  public UrlView(Context context, AttributeSet attrs) {
     this(context, attrs, DEFAULT_ATTRS);
   }
 
-  public ItemView(Context context, AttributeSet attrs, int defStyleAttr) {
+  public UrlView(Context context, AttributeSet attrs, int defStyleAttr) {
     this(context, attrs, defStyleAttr, DEFAULT_STYLE);
   }
 
-  public ItemView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+  public UrlView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
     super(context, attrs, defStyleAttr, defStyleRes);
     final Resources.Theme theme = context.getTheme();
     final TypedArray attributes = theme.obtainStyledAttributes(attrs, DEFAULT_STYLEABLE, defStyleAttr, defStyleRes);
@@ -56,27 +58,17 @@ public class ItemView extends RelativeLayout implements Consumer<Item>, Runnable
     } finally {
       attributes.recycle();
     }
-
-    System.out.println("INITIAL ItemView.ItemView: " + this.hashCode());
   }
 
   @Override
   protected void onFinishInflate() {
     super.onFinishInflate();
-    mContainerItem = findViewById(R.id.container_item);
     mTextView = findViewById(R.id.text_item);
   }
 
   @Override
-  public void accept(Item item) {
-    //System.out.println("ItemView.accept: " + hashCode() + " || item: " + item.getId());
-    mTextView.setText(item.getText());
-    mTextView.setBackgroundColor(item.getColor());
-  }
-
-  @Override
-  public void run() {
-    //System.out.println("ItemView.onUnbind: " + this.hashCode());
+  public void accept(String url) {
+    mTextView.setText(url);
   }
 
 }

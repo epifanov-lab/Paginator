@@ -1,6 +1,9 @@
-package com.example.paginationpolygon;
+package com.example.paginationpolygon.utills;
 
+import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -130,6 +134,75 @@ public class Utils {
         super.onViewRecycled(holder);
       }
     };
+  }
+
+  @SuppressWarnings("SameParameterValue")
+  public static <T> ListAdapter<T, RecyclerView.ViewHolder>
+  getSimpleAdapter(@NonNull LayoutInflater inflater, @LayoutRes int layout) {
+    return new ListAdapter<T, RecyclerView.ViewHolder>(
+      new AsyncDifferConfig.Builder<>
+        (new DiffUtil.ItemCallback<T>() {
+          @SuppressWarnings("NullableProblems")
+          @Override
+          public final boolean
+          areItemsTheSame(T oldItem, T newItem) {
+            return oldItem.hashCode() == newItem.hashCode();
+          }
+
+          @SuppressWarnings("NullableProblems")
+          @Override
+          public final boolean
+          areContentsTheSame(T oldItem, T newItem) {
+            return Objects.equals(oldItem, newItem);
+          }
+        }).setBackgroundThreadExecutor(Runnable::run)
+        .build()
+    ) {
+      {
+        setHasStableIds(false);
+      }
+
+      @SuppressWarnings("NullableProblems")
+      @Override
+      public final RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
+        return new RecyclerView.ViewHolder(inflater.inflate(type, parent, false)) {
+        };
+      }
+
+      @SuppressWarnings({"unchecked", "NullableProblems"})
+      @Override
+      public final void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        ((Consumer<T>) holder.itemView).accept(getItem(position));
+      }
+
+      /*@SuppressWarnings("ConstantConditions")
+      @Override public final long getItemId(int position)
+      {return getItem(position).hashCode();}*/
+      @Override
+      public final int getItemViewType(int position) {
+        return layout;
+      }
+    };
+  }
+
+  public static int getScreenWidthInDp(Context context) {
+    Configuration config = context.getResources().getConfiguration();
+    return config.screenWidthDp;
+  }
+
+  public static int getScreenHeightInDp(Context context) {
+    Configuration config = context.getResources().getConfiguration();
+    return config.screenHeightDp;
+  }
+
+  public static float getScreenWidthInPx(Context context) {
+    Configuration config = context.getResources().getConfiguration();
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, config.screenWidthDp, context.getResources().getDisplayMetrics());
+  }
+
+  public static float getScreenHeightInPx(Context context) {
+    Configuration config = context.getResources().getConfiguration();
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, config.screenHeightDp, context.getResources().getDisplayMetrics());
   }
 
 }

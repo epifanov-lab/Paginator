@@ -1,5 +1,7 @@
 package com.example.paginationpolygon;
 
+import com.example.paginationpolygon.pagination.Item;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,27 +14,27 @@ import reactor.core.scheduler.Schedulers;
  */
 public class DataService {
 
-  private final List<String> mList;
+  private final List<String> mPaginationList;
 
   public DataService() {
-    mList = new ArrayList<>();
+    mPaginationList = new ArrayList<>();
     for (int i = 0; i < Constants.ITEMS_TOTAL_SIZE; i++) {
-      mList.add(String.valueOf(i));
+      mPaginationList.add(String.valueOf(i));
     }
   }
 
   public Mono<Item[]> load(int offset, int size) {
-    int limit = Math.min(mList.size(), offset + size);
+    int limit = Math.min(mPaginationList.size(), offset + size);
 
     return Mono.fromCallable(() -> {
       Thread.sleep(Constants.API_DELAY);
 
-      final List<String> list = mList.subList(offset, limit);
+      final List<String> list = mPaginationList.subList(offset, limit);
 
       Item[] result = new Item[list.size()];
       for (int i = 0; i < list.size(); i++) {
         int position = offset + i;
-        String s = mList.get(position);
+        String s = mPaginationList.get(position);
         result[i] = new Item(s, position);
       }
 
@@ -43,15 +45,15 @@ public class DataService {
   }
 
   public void addItem() {
-    mList.add(0, String.valueOf(mList.size() + 1));
+    mPaginationList.add(0, String.valueOf(mPaginationList.size() + 1));
   }
 
   public void deleteItem() {
-    mList.remove("2");
+    mPaginationList.remove("2");
   }
 
   public void changeItem() {
-    mList.set(2, "CHANGED");
+    mPaginationList.set(2, "CHANGED");
   }
 
 }
