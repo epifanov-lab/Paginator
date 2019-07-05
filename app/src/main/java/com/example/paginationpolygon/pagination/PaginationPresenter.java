@@ -27,7 +27,7 @@ public class PaginationPresenter implements Disposable {
   private final DataService mDataService;
 
   /** Default constructor. */
-  PaginationPresenter(@NonNull PaginationActivity view) {
+  PaginationPresenter(@NonNull PaginationFragment view) {
 
     mDataService = new DataService();
 
@@ -44,7 +44,7 @@ public class PaginationPresenter implements Disposable {
         .doOnNext(o -> view.showLoadingIndicator(true))
         .map(v -> Math.max(view.getCurrentRecyclerTopPosition(), 0))
         .switchMap(paginator::apply)
-        .publishOn(Schedulers.fromExecutor(view::runOnUiThread))
+        .publishOn(Schedulers.fromExecutor(view.getActivity()::runOnUiThread))
         .doOnNext(o -> view.showLoadingIndicator(false))
         .subscribe(view::submitList),
 

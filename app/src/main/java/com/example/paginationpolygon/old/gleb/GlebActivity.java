@@ -27,7 +27,7 @@ public class GlebActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    //setContentView(R.layout.activity_pagination);
+    //setContentView(R.layout.fragment_pagination);
 
     final TextView textview = findViewById(R.id.text);
     /*final Flux<View> f = toFlux(textview);

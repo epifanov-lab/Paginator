@@ -1,25 +1,26 @@
 package com.example.paginationpolygon.player;
 
 import android.animation.Animator;
-import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.paginationpolygon.MainActivity;
 import com.example.paginationpolygon.R;
+import com.example.paginationpolygon.utills.OnSwipeTouchListener;
 import com.example.paginationpolygon.utills.RecyclerTouchHelper;
 import com.example.paginationpolygon.utills.Utils;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.hls.DefaultHlsExtractorFactory;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
@@ -35,8 +36,11 @@ import reactor.core.publisher.Flux;
 import static com.example.paginationpolygon.utills.Utils.toFlux;
 import static java.util.Objects.requireNonNull;
 
-
-public class PlayerActivity extends AppCompatActivity {
+/**
+ * @author Konstantin Epifanov
+ * @since 05.07.2019
+ */
+public class PlayerFragment extends Fragment {
 
   private static final int ITEM_LAYOUT = R.layout.item_url;
 
@@ -52,56 +56,69 @@ public class PlayerActivity extends AppCompatActivity {
   private PlayerView mPlayerView_2;
   private PlayerView currentPlayer;
 
-  private SimpleExoPlayer mExoPlayer;
-
   private RecyclerView mRecyclerUrls;
+
+  private View mContainerMain;
 
   private PlayerPresenter mPresenter;
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_player);
+  private View test;
 
-    mPlayerView_1 = findViewById(R.id.player_view_1);
-    mPlayerView_2 = findViewById(R.id.player_view_2);
+  public static PlayerFragment newInstance() {
+    return new PlayerFragment();
+  }
+
+  @SuppressLint("ClickableViewAccessibility")
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                           Bundle savedInstanceState) {
+    View root = inflater.inflate(R.layout.fragment_player, null);
+
+    mPlayerView_1 = root.findViewById(R.id.player_view_1);
+    mPlayerView_2 = root.findViewById(R.id.player_view_2);
     currentPlayer = mPlayerView_1;
 
-    mPlayerView_2.setOnClickListener(v -> {
-      //todo
+    mContainerMain = root.findViewById(R.id.container_main);
+
+    mPlayerView_2.setOnTouchListener(new OnSwipeTouchListener(getContext()) {
+      @Override
+      public void onClick() {
+        super.onClick();
+        startFullPlayerActivity();
+      }
     });
 
-    mProgress = findViewById(R.id.progress);
-    mRecyclerUrls = findViewById(R.id.recycler_urls);
+    mProgress = root.findViewById(R.id.progress);
+    mRecyclerUrls = root.findViewById(R.id.recycler_urls);
 
-    mFluxRestart = toFlux(findViewById(R.id.button_restart));
-    mFluxSwap = toFlux(findViewById(R.id.button_swap));
-    mFluxStart = toFlux(findViewById(R.id.button_start));
-    mFluxStop = toFlux(findViewById(R.id.button_stop));
-    mFluxBigger = toFlux(findViewById(R.id.button_bigger));
-    mFluxSmaller = toFlux(findViewById(R.id.button_smaller));
-    mFluxScale= toFlux(findViewById(R.id.button_scale));
+    mFluxRestart = toFlux(root.findViewById(R.id.button_restart));
+    mFluxSwap = toFlux(root.findViewById(R.id.button_swap));
+    mFluxStart = toFlux(root.findViewById(R.id.button_start));
+    mFluxStop = toFlux(root.findViewById(R.id.button_stop));
+    mFluxBigger = toFlux(root.findViewById(R.id.button_bigger));
+    mFluxSmaller = toFlux(root.findViewById(R.id.button_smaller));
+    mFluxScale = toFlux(root.findViewById(R.id.button_scale));
 
-    mRecyclerUrls.setAdapter(Utils.getSimpleAdapter(LayoutInflater.from(getApplicationContext()), ITEM_LAYOUT));
-    mRecyclerUrls.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+    mRecyclerUrls.setAdapter(Utils.getSimpleAdapter(LayoutInflater.from(getContext()), ITEM_LAYOUT));
+    mRecyclerUrls.setLayoutManager(new LinearLayoutManager(getContext()));
     new RecyclerTouchHelper(mRecyclerUrls, mUrlClicks::onNext);
+
+    test = root.findViewById(R.id.test);
 
     mPresenter = new PlayerPresenter(this);
 
+    return root;
   }
 
+
   private void initializePlayer(PlayerView playerView, String url) {
-    if (mExoPlayer == null) {
-      mExoPlayer = ExoPlayerFactory.newSimpleInstance(this);
-      mExoPlayer.setPlayWhenReady(true); // pause or start (не влияет на флоу загрузки)
-    }
 
     if (url != null) {
-      MediaSource mediaSource = buildMediaSource(getApplicationContext(), Uri.parse(url));
-      mExoPlayer.prepare(mediaSource, true, false);
+      MediaSource mediaSource = buildMediaSource(getContext(), Uri.parse(url));
+      ExoHolder.get(getContext()).prepare(mediaSource, true, false);
     }
 
-    playerView.setPlayer(mExoPlayer);
+    playerView.setPlayer(ExoHolder.get(getContext()));
   }
 
   private MediaSource buildMediaSource(Context context, Uri uri) {
@@ -112,11 +129,11 @@ public class PlayerActivity extends AppCompatActivity {
   }
 
   private void releasePlayer() {
-    if (mExoPlayer != null) {
-      mExoPlayer.stop();
-      mExoPlayer.release();
-      mExoPlayer = null;
-    }
+    /*if (ExoHolder.get(getContext()) != null) {
+      ExoHolder.get(getContext()).stop();
+      ExoHolder.get(getContext()).release();
+      ExoHolder.get(getContext()) = null;
+    }*/
   }
 
   public void onClickUrl(String url) {
@@ -126,12 +143,12 @@ public class PlayerActivity extends AppCompatActivity {
 
   public void onClickStart() {
     System.out.println("PlayerActivity.onClickStart");
-    if (mExoPlayer != null) mExoPlayer.setPlayWhenReady(true);
+    if (ExoHolder.get(getContext()) != null) ExoHolder.get(getContext()).setPlayWhenReady(true);
   }
 
   public void onClickStop() {
     System.out.println("PlayerActivity.onClickStop");
-    if (mExoPlayer != null) mExoPlayer.setPlayWhenReady(false);
+    if (ExoHolder.get(getContext()) != null) ExoHolder.get(getContext()).setPlayWhenReady(false);
   }
 
   public void onClickBigger() {
@@ -151,7 +168,7 @@ public class PlayerActivity extends AppCompatActivity {
       .scaleY(factor)
       .setDuration(1000)
       .setInterpolator(new FastOutSlowInInterpolator())
-      ;
+    ;
   }
 
   private void changeSize(View v, float factor) {
@@ -169,7 +186,7 @@ public class PlayerActivity extends AppCompatActivity {
     System.out.println("PlayerActivity.onClickSwap");
     PlayerView n = currentPlayer == mPlayerView_1 ? mPlayerView_2 : mPlayerView_1;
     PlayerView o = currentPlayer == mPlayerView_1 ? mPlayerView_1 : mPlayerView_2;
-    PlayerView.switchTargetView(mExoPlayer, o, n);
+    PlayerView.switchTargetView(ExoHolder.get(getContext()), o, n);
     currentPlayer = n;
   }
 
@@ -184,24 +201,39 @@ public class PlayerActivity extends AppCompatActivity {
   }
 
   public void restart() {
-    Intent intent = getIntent();
-    finish();
-    startActivity(intent);
+    ((MainActivity) getActivity()).restart();
   }
 
-  @Override
-  public void onPause() {
-    super.onPause();
-    if (mPlayerView_1 != null) mPlayerView_1.onPause();
-    if (mPlayerView_2 != null) mPlayerView_2.onPause();
-    releasePlayer();
+  public void startFullPlayerActivity() {
+    System.out.println("PlayerActivity.startFullPlayerActivity");
+    ((MainActivity) getActivity()).transitionToFullPlayer(test);
   }
 
-  @Override
-  public void onStop() {
-    super.onStop();
-    if (mPlayerView_1 != null) mPlayerView_1.onPause();
-    if (mPlayerView_2 != null) mPlayerView_2.onPause();
-    releasePlayer();
+  private void scaleToFullScreen(Runnable endCallback) {
+    mPlayerView_2.animate()
+      .scaleX(1f)
+      .setDuration(1000)
+      .setInterpolator(new FastOutSlowInInterpolator())
+      .setListener(new Animator.AnimatorListener() {
+        @Override
+        public void onAnimationStart(Animator animation) {
+
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+          endCallback.run();
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {
+
+        }
+      });
   }
 }

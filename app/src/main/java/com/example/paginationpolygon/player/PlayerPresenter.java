@@ -59,7 +59,7 @@ public class PlayerPresenter implements Disposable {
   private boolean bigger = true;
 
   /** Default constructor. */
-  PlayerPresenter(@NonNull PlayerActivity view) {
+  PlayerPresenter(@NonNull PlayerFragment view) {
 
     mDataService = new DataService();
 

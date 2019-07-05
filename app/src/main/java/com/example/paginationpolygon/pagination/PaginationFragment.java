@@ -4,13 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.paginationpolygon.MainActivity;
 import com.example.paginationpolygon.R;
 import com.example.paginationpolygon.utills.Utils;
 
@@ -19,8 +21,11 @@ import reactor.core.publisher.Flux;
 import static com.example.paginationpolygon.utills.Utils.toFlux;
 import static java.util.Objects.requireNonNull;
 
-
-public class PaginationActivity extends AppCompatActivity {
+/**
+ * @author Konstantin Epifanov
+ * @since 05.07.2019
+ */
+public class PaginationFragment extends Fragment {
 
   private static final int ITEM_LAYOUT = R.layout.item_pagination;
 
@@ -31,23 +36,28 @@ public class PaginationActivity extends AppCompatActivity {
   private View mProgress;
   private PaginationPresenter mPresenter;
 
+  public static PaginationFragment newInstance() {
+    return new PaginationFragment();
+  }
+
   @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_pagination);
+  public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                           Bundle savedInstanceState) {
 
-    mFluxRefresh = toFlux(findViewById(R.id.button_refresh));
-    mFluxRestart = toFlux(findViewById(R.id.button_restart));
-    mFluxAdd = toFlux(findViewById(R.id.button_add));
-    mFluxDelete = toFlux(findViewById(R.id.button_delete));
-    mFluxChange = toFlux(findViewById(R.id.button_change));
+    View root = inflater.inflate(R.layout.fragment_pagination, null);
 
-    mRecycler = findViewById(R.id.recycler);
+    mFluxRefresh = toFlux(root.findViewById(R.id.button_refresh));
+    mFluxRestart = toFlux(root.findViewById(R.id.button_restart));
+    mFluxAdd = toFlux(root.findViewById(R.id.button_add));
+    mFluxDelete = toFlux(root.findViewById(R.id.button_delete));
+    mFluxChange = toFlux(root.findViewById(R.id.button_change));
 
-    mProgress = findViewById(R.id.progress);
+    mRecycler = root.findViewById(R.id.recycler);
 
-    mRecycler.setAdapter(Utils.getPagedAdapter(LayoutInflater.from(getApplicationContext()), ITEM_LAYOUT));
-    mRecycler.setLayoutManager(new LinearLayoutManager(getApplicationContext()) {
+    mProgress = root.findViewById(R.id.progress);
+
+    mRecycler.setAdapter(Utils.getPagedAdapter(LayoutInflater.from(getContext()), ITEM_LAYOUT));
+    mRecycler.setLayoutManager(new LinearLayoutManager(getContext()) {
       @Override
       public boolean supportsPredictiveItemAnimations() {
         return false;
@@ -59,7 +69,9 @@ public class PaginationActivity extends AppCompatActivity {
 
     mPresenter = new PaginationPresenter(this);
 
+    return root;
   }
+
 
   @SuppressWarnings("unchecked")
   public void submitList(PagedList<Item> list) {
@@ -87,8 +99,6 @@ public class PaginationActivity extends AppCompatActivity {
   }
 
   public void restart() {
-    Intent intent = getIntent();
-    finish();
-    startActivity(intent);
+    ((MainActivity) getActivity()).restart();
   }
 }
