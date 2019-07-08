@@ -59,7 +59,7 @@ public class PlayerPresenter implements Disposable {
   private boolean bigger = true;
 
   /** Default constructor. */
-  PlayerPresenter(@NonNull PlayerFragment view) {
+  PlayerPresenter(@NonNull PlayersTabView view) {
 
     mDataService = new DataService();
 
@@ -98,9 +98,9 @@ public class PlayerPresenter implements Disposable {
         .doOnNext(o -> view.onClickScale(bigger))
         .subscribe(),
 
-      view .mFluxSwap
-      .doOnNext(o -> view.onClickSwap())
-      .subscribe()
+      view.mFluxSwap
+        .doOnNext(o -> view.onClickSwap())
+        .subscribe()
 
     );
   }

@@ -27,7 +27,7 @@ public class GlebActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    //setContentView(R.layout.fragment_pagination);
+    //setContentView(R.layout.tab_pagination);
 
     final TextView textview = findViewById(R.id.text);
     /*final Flux<View> f = toFlux(textview);
@@ -55,13 +55,12 @@ public class GlebActivity extends AppCompatActivity {
       @Override
       public void onClick(View v) {
 
-        swap.update (
+        swap.update(
           concatStrMono("str", String.valueOf(System.currentTimeMillis()))
             .publishOn(Schedulers.fromExecutor(textview::post))
             .delayElement(Duration.ofSeconds(3))
             .subscribe(textview::setText)
         );
-
 
 
       }
@@ -88,6 +87,7 @@ public class GlebActivity extends AppCompatActivity {
       public void dispose() {
         view.setOnClickListener(null);
       }
+
       @Override
       public boolean isDisposed() {
         return !view.hasOnClickListeners();
@@ -99,12 +99,18 @@ public class GlebActivity extends AppCompatActivity {
 
     System.out.println("before");
 
-    try {Thread.sleep(1000);}
-    catch (InterruptedException exception)
-    {exception.printStackTrace(); return null;}
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException exception) {
+      exception.printStackTrace();
+      return null;
+    }
 
-    try {return a + b;}
-    finally {System.out.println("after");}
+    try {
+      return a + b;
+    } finally {
+      System.out.println("after");
+    }
   }
 
   private Thread concatStringAsync(String a, String b, Consumer<String> onReady) {

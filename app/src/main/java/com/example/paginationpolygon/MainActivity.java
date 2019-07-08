@@ -3,19 +3,19 @@ package com.example.paginationpolygon;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.transition.ChangeImageTransform;
+import android.transition.ChangeBounds;
+import android.transition.ChangeTransform;
+import android.transition.Fade;
+import android.transition.Transition;
+import android.transition.TransitionSet;
 import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.fragment.app.FragmentTransaction;
 
-import com.example.paginationpolygon.pagination.PaginationFragment;
 import com.example.paginationpolygon.player.FullPlayerFragment;
-import com.example.paginationpolygon.player.PlayerFragment;
 
 /**
  * @author Konstantin Epifanov
@@ -23,74 +23,39 @@ import com.example.paginationpolygon.player.PlayerFragment;
  */
 public class MainActivity extends AppCompatActivity {
 
-  private ViewPager mPager;
-
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    mPager = findViewById(R.id.view_pager);
-
-    mPager.setAdapter(
-      new FragmentPagerAdapter(getSupportFragmentManager(),
-        FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-
-        @NonNull
-        @Override
-        public Fragment getItem(int position) {
-          Fragment page = PaginationFragment.newInstance();
-          switch (position) {
-            case 0:
-              page = PaginationFragment.newInstance();
-              break;
-            case 1:
-              page = PlayerFragment.newInstance();
-              break;
-          }
-          return page;
-        }
-
-        @Override
-        public int getCount() {
-          return 2;
-        }
-      });
-
-    mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-      @Override
-      public void onPageSelected(int position) {
-        System.out.println("onPageSelected: position = [" + position + "]");
-      }
-
-      @Override
-      public void onPageScrolled(int position, float positionOffset,
-                                 int positionOffsetPixels) {
-        System.out.println("onPageScrolled: position = [" + position + "], positionOffset = [" + positionOffset + "], positionOffsetPixels = [" + positionOffsetPixels + "]");
-      }
-
-      @Override
-      public void onPageScrollStateChanged(int state) {
-        System.out.println("onPageScrollStateChanged: state = [" + state + "]");
-      }
-    });
+    getSupportFragmentManager().beginTransaction()
+      .replace(R.id.fragment_container, PagerFragment.newInstance())
+      .commit();
   }
 
-  public void transitionToFullPlayer(View view) {
-    FullPlayerFragment fragment = FullPlayerFragment.newInstance();
+  public void goToNextFragment(View... shared) {
+    Fragment fragment = FullPlayerFragment.newInstance();
 
-    fragment.setSharedElementEnterTransition(new ChangeImageTransform().setDuration(1000));
-    fragment.setSharedElementReturnTransition(new ChangeImageTransform().setDuration(1000));
+    Transition scale = new ChangeBounds();
+    Transition fade = new Fade();
 
-    System.out.println("MainActivity.transitionToFullPlayer: " + view.getTransitionName());
+    TransitionSet set = new TransitionSet()
+      .addTransition(new ChangeBounds())
+      .addTransition(new ChangeTransform());
 
-    getSupportFragmentManager().beginTransaction()
-      .addSharedElement(view, view.getTransitionName())
-      .replace(R.id.fragment_container, fragment, fragment.getClass().getSimpleName())
-      .addToBackStack(null)
-      .commit();
+    fragment.setSharedElementEnterTransition(set);
+    fragment.setSharedElementReturnTransition(set);
+
+    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+    transaction.replace(R.id.fragment_container, fragment);
+
+    for (View v : shared) {
+      transaction.addSharedElement(v, v.getTransitionName());
+    }
+
+    transaction.addToBackStack(null);
+    transaction.commit();
   }
 
   public void restart() {
@@ -98,4 +63,5 @@ public class MainActivity extends AppCompatActivity {
     finish();
     startActivity(intent);
   }
+
 }

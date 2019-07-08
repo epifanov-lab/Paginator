@@ -13,23 +13,24 @@ import android.util.AttributeSet;
  *
  * @author bherbst
  */
-public class PlayerTransition extends TransitionSet {
-  public PlayerTransition() {
+public class TransformTransition extends TransitionSet {
+
+  public TransformTransition() {
     init();
   }
 
   /**
    * This constructor allows us to use this transition in XML
    */
-  public PlayerTransition(Context context, AttributeSet attrs) {
+  public TransformTransition(Context context, AttributeSet attrs) {
     super(context, attrs);
     init();
   }
 
   private void init() {
     setOrdering(ORDERING_TOGETHER);
-    addTransition(new ChangeBounds())
-      .addTransition(new ChangeTransform()
-        .setDuration(1000));
+    addTransition(new ChangeBounds()).
+      addTransition(new ChangeTransform()).
+      addTransition(new ChangeImageTransform());
   }
 }

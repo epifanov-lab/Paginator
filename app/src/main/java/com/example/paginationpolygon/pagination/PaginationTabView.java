@@ -1,12 +1,11 @@
 package com.example.paginationpolygon.pagination;
 
-import android.content.Intent;
-import android.os.Bundle;
+import android.content.Context;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
-import androidx.fragment.app.Fragment;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,7 +24,7 @@ import static java.util.Objects.requireNonNull;
  * @author Konstantin Epifanov
  * @since 05.07.2019
  */
-public class PaginationFragment extends Fragment {
+public class PaginationTabView extends ConstraintLayout {
 
   private static final int ITEM_LAYOUT = R.layout.item_pagination;
 
@@ -36,26 +35,35 @@ public class PaginationFragment extends Fragment {
   private View mProgress;
   private PaginationPresenter mPresenter;
 
-  public static PaginationFragment newInstance() {
-    return new PaginationFragment();
+  public PaginationTabView(Context context) {
+    this(context, null);
+  }
+
+  public PaginationTabView(Context context, AttributeSet attrs) {
+    this(context, attrs, 0);
+  }
+
+  public PaginationTabView(Context context, AttributeSet attrs, int defStyleAttr) {
+    this(context, attrs, defStyleAttr, 0);
+  }
+
+  public PaginationTabView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    super(context, attrs, defStyleAttr, defStyleRes);
   }
 
   @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
+  protected void onFinishInflate() {
+    super.onFinishInflate();
 
-    View root = inflater.inflate(R.layout.fragment_pagination, null);
+    mProgress = this.findViewById(R.id.progress);
 
-    mFluxRefresh = toFlux(root.findViewById(R.id.button_refresh));
-    mFluxRestart = toFlux(root.findViewById(R.id.button_restart));
-    mFluxAdd = toFlux(root.findViewById(R.id.button_add));
-    mFluxDelete = toFlux(root.findViewById(R.id.button_delete));
-    mFluxChange = toFlux(root.findViewById(R.id.button_change));
+    mFluxRefresh = toFlux(this.findViewById(R.id.button_refresh));
+    mFluxRestart = toFlux(this.findViewById(R.id.button_restart));
+    mFluxAdd = toFlux(this.findViewById(R.id.button_add));
+    mFluxDelete = toFlux(this.findViewById(R.id.button_delete));
+    mFluxChange = toFlux(this.findViewById(R.id.button_change));
 
-    mRecycler = root.findViewById(R.id.recycler);
-
-    mProgress = root.findViewById(R.id.progress);
-
+    mRecycler = this.findViewById(R.id.recycler);
     mRecycler.setAdapter(Utils.getPagedAdapter(LayoutInflater.from(getContext()), ITEM_LAYOUT));
     mRecycler.setLayoutManager(new LinearLayoutManager(getContext()) {
       @Override
@@ -68,10 +76,7 @@ public class PaginationFragment extends Fragment {
     //mRecycler.setItemAnimator(null);
 
     mPresenter = new PaginationPresenter(this);
-
-    return root;
   }
-
 
   @SuppressWarnings("unchecked")
   public void submitList(PagedList<Item> list) {
@@ -99,6 +104,6 @@ public class PaginationFragment extends Fragment {
   }
 
   public void restart() {
-    ((MainActivity) getActivity()).restart();
+    ((MainActivity) getContext()).restart();
   }
 }

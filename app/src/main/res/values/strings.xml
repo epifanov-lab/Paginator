@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">PaginationPolygon</string>
+
+    <string name="shared_player">shared_player</string>
+    <string name="shared_image">shared_image</string>
+
 </resources>

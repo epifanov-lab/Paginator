@@ -4,13 +4,12 @@ import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
-import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import androidx.fragment.app.Fragment;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
@@ -40,7 +39,7 @@ import static java.util.Objects.requireNonNull;
  * @author Konstantin Epifanov
  * @since 05.07.2019
  */
-public class PlayerFragment extends Fragment {
+public class PlayersTabView extends ConstraintLayout {
 
   private static final int ITEM_LAYOUT = R.layout.item_url;
 
@@ -62,23 +61,36 @@ public class PlayerFragment extends Fragment {
 
   private PlayerPresenter mPresenter;
 
-  private View test;
+  private ImageView test;
 
-  public static PlayerFragment newInstance() {
-    return new PlayerFragment();
+  public PlayersTabView(Context context) {
+    this(context, null);
   }
 
-  @SuppressLint("ClickableViewAccessibility")
-  @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
-    View root = inflater.inflate(R.layout.fragment_player, null);
+  public PlayersTabView(Context context, AttributeSet attrs) {
+    this(context, attrs, 0);
+  }
 
-    mPlayerView_1 = root.findViewById(R.id.player_view_1);
-    mPlayerView_2 = root.findViewById(R.id.player_view_2);
+  public PlayersTabView(Context context, AttributeSet attrs, int defStyleAttr) {
+    this(context, attrs, defStyleAttr, 0);
+  }
+
+  public PlayersTabView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    super(context, attrs, defStyleAttr, defStyleRes);
+  }
+
+  @Override
+  @SuppressLint("ClickableViewAccessibility")
+  protected void onFinishInflate() {
+    super.onFinishInflate();
+
+    mPlayerView_1 = this.findViewById(R.id.player_view_1);
+    mPlayerView_2 = this.findViewById(R.id.player_view_2);
     currentPlayer = mPlayerView_1;
 
-    mContainerMain = root.findViewById(R.id.container_main);
+    mContainerMain = this.findViewById(R.id.container_player_main);
+
+    test = this.findViewById(R.id.test_start);
 
     mPlayerView_2.setOnTouchListener(new OnSwipeTouchListener(getContext()) {
       @Override
@@ -88,28 +100,25 @@ public class PlayerFragment extends Fragment {
       }
     });
 
-    mProgress = root.findViewById(R.id.progress);
-    mRecyclerUrls = root.findViewById(R.id.recycler_urls);
+    mProgress = this.findViewById(R.id.progress);
+    mRecyclerUrls = this.findViewById(R.id.recycler_urls);
 
-    mFluxRestart = toFlux(root.findViewById(R.id.button_restart));
-    mFluxSwap = toFlux(root.findViewById(R.id.button_swap));
-    mFluxStart = toFlux(root.findViewById(R.id.button_start));
-    mFluxStop = toFlux(root.findViewById(R.id.button_stop));
-    mFluxBigger = toFlux(root.findViewById(R.id.button_bigger));
-    mFluxSmaller = toFlux(root.findViewById(R.id.button_smaller));
-    mFluxScale = toFlux(root.findViewById(R.id.button_scale));
+    mFluxRestart = toFlux(this.findViewById(R.id.button_restart));
+    mFluxSwap = toFlux(this.findViewById(R.id.button_swap));
+    mFluxStart = toFlux(this.findViewById(R.id.button_start));
+    mFluxStop = toFlux(this.findViewById(R.id.button_stop));
+    mFluxBigger = toFlux(this.findViewById(R.id.button_bigger));
+    mFluxSmaller = toFlux(this.findViewById(R.id.button_smaller));
+    mFluxScale = toFlux(this.findViewById(R.id.button_scale));
 
     mRecyclerUrls.setAdapter(Utils.getSimpleAdapter(LayoutInflater.from(getContext()), ITEM_LAYOUT));
     mRecyclerUrls.setLayoutManager(new LinearLayoutManager(getContext()));
     new RecyclerTouchHelper(mRecyclerUrls, mUrlClicks::onNext);
 
-    test = root.findViewById(R.id.test);
 
     mPresenter = new PlayerPresenter(this);
 
-    return root;
   }
-
 
   private void initializePlayer(PlayerView playerView, String url) {
 
@@ -201,12 +210,11 @@ public class PlayerFragment extends Fragment {
   }
 
   public void restart() {
-    ((MainActivity) getActivity()).restart();
+    ((MainActivity) getContext()).restart();
   }
 
   public void startFullPlayerActivity() {
-    System.out.println("PlayerActivity.startFullPlayerActivity");
-    ((MainActivity) getActivity()).transitionToFullPlayer(test);
+    ((MainActivity) getContext()).goToNextFragment(mPlayerView_2, test);
   }
 
   private void scaleToFullScreen(Runnable endCallback) {
@@ -235,5 +243,11 @@ public class PlayerFragment extends Fragment {
 
         }
       });
+  }
+
+  @Override
+  protected void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    mPlayerView_2.setPlayer(ExoHolder.get(getContext()));
   }
 }
