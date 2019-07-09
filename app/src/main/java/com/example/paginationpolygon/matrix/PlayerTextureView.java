@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.TextureView;
 
@@ -36,6 +37,17 @@ public class PlayerTextureView extends TextureView {
   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
     System.out.println("onSizeChanged: w = [" + w + "], h = [" + h + "], oldw = [" + oldw + "], oldh = [" + oldh + "]");
+  }
+
+  @Override
+  public void setBackgroundDrawable(Drawable background) {
+    super.setBackgroundDrawable(background);
+  }
+
+  @Override
+  public void setBackground(Drawable background) {
+    super.setBackground(background);
+
   }
 
   /**

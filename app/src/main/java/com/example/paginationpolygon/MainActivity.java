@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.paginationpolygon.card.CardFragment;
 import com.example.paginationpolygon.player.FullPlayerFragment;
 
 /**
@@ -30,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
     getSupportFragmentManager().beginTransaction()
       .replace(R.id.fragment_container,
-        PagerFragment.newInstance(),
-        PagerFragment.class.getSimpleName())
+        CardFragment.newInstance(),
+        CardFragment.class.getSimpleName())
       .commit();
   }
 

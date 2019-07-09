@@ -36,6 +36,7 @@ public class ExoHolder {
     if (instance.player == null) {
       instance.player = ExoPlayerFactory.newSimpleInstance(context);
       instance.player.setPlayWhenReady(true);
+      instance.player.setVolume(0f);
     }
 
     if (url != null) {
