@@ -4,7 +4,6 @@ package com.example.paginationpolygon;
 import android.content.Intent;
 import android.os.Bundle;
 import android.transition.ChangeBounds;
-import android.transition.ChangeTransform;
 import android.transition.Fade;
 import android.transition.Transition;
 import android.transition.TransitionSet;
@@ -30,22 +29,32 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
 
     getSupportFragmentManager().beginTransaction()
-      .replace(R.id.fragment_container, PagerFragment.newInstance())
+      .replace(R.id.fragment_container,
+        PagerFragment.newInstance(),
+        PagerFragment.class.getSimpleName())
       .commit();
   }
 
-  public void goToNextFragment(View... shared) {
+  public void goToFull(Fragment host, View... shared) {
     Fragment fragment = FullPlayerFragment.newInstance();
 
-    Transition scale = new ChangeBounds();
-    Transition fade = new Fade();
+    final int duration = 2000;
 
-    TransitionSet set = new TransitionSet()
+    Transition scale = new ChangeBounds().setDuration(duration);
+    Transition fade = new Fade().setDuration(duration / 2);
+
+    TransitionSet combo = new TransitionSet()
       .addTransition(new ChangeBounds())
-      .addTransition(new ChangeTransform());
+      //.addTransition(new ChangeImageTransform())
+      //.addTransition(new ChangeClipBounds())
+      //.addTransition(new ChangeTransform())
+      .setDuration(duration);
 
-    fragment.setSharedElementEnterTransition(set);
-    fragment.setSharedElementReturnTransition(set);
+    fragment.setSharedElementEnterTransition(scale);
+    fragment.setSharedElementReturnTransition(scale);
+
+    host.setExitTransition(fade);
+    host.setEnterTransition(fade);
 
     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
     transaction.replace(R.id.fragment_container, fragment);
@@ -56,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
     transaction.addToBackStack(null);
     transaction.commit();
+
   }
 
   public void restart() {

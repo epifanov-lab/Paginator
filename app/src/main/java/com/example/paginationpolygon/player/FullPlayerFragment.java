@@ -7,15 +7,15 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import androidx.core.app.SharedElementCallback;
 import androidx.fragment.app.Fragment;
 
 import com.example.paginationpolygon.R;
-import com.google.android.exoplayer2.ui.PlayerView;
+import com.example.paginationpolygon.matrix.PlayerTextureView;
 
 import java.util.List;
 import java.util.Map;
@@ -26,8 +26,11 @@ import java.util.Map;
  */
 public class FullPlayerFragment extends Fragment {
 
-  private PlayerView mPlayerView;
-  private ImageView mImageTest;
+  //private PlayerView mPlayerView;
+
+  private View mImageTest;
+
+  private PlayerTextureView mTextureView;
 
   public static FullPlayerFragment newInstance() {
     return new FullPlayerFragment();
@@ -41,7 +44,9 @@ public class FullPlayerFragment extends Fragment {
 
     System.out.println("FullPlayerFragment.onCreateView");
 
-    mPlayerView = root.findViewById(R.id.player_view);
+    //mPlayerView = root.findViewById(R.id.player_view);
+    mTextureView = root.findViewById(R.id.texture_end);
+
     mImageTest = root.findViewById(R.id.test_end);
 
     setEnterSharedElementCallback(new SharedElementCallback() {
@@ -154,13 +159,15 @@ public class FullPlayerFragment extends Fragment {
   public void onStart() {
     super.onStart();
     System.out.println("FullPlayerFragment.onStart");
-    mPlayerView.setPlayer(ExoHolder.get(getContext()));
+    //mPlayerView.setPlayer(ExoHolder.get(getContext()));
   }
 
   @Override
   public void onResume() {
     super.onResume();
     System.out.println("FullPlayerFragment.onResume");
+    //mPlayerView.setPlayer(ExoHolder.get(getContext()));
+    ExoHolder.get(getContext(), null).setVideoTextureView(mTextureView);
   }
 
   @Override

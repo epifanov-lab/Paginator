@@ -18,6 +18,20 @@
         app:layout_constraintTop_toTopOf="parent"
         app:use_controller="false" />
 
+    <FrameLayout
+        android:id="@+id/player_container"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:padding="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.241"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.082">
+
+    </FrameLayout>
+
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/player_view_2"
         android:layout_width="200dp"
@@ -25,23 +39,35 @@
         android:background="@drawable/background_player"
         android:clickable="true"
         android:padding="4dp"
-        android:transitionName="@string/shared_player"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.924"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.427"
         app:resize_mode="zoom"
+        app:surface_type="texture_view"
         app:use_controller="false" />
 
-    <ImageView
+    <TextureView
+        android:id="@+id/texture_1"
+        android:layout_width="133dp"
+        android:layout_height="126dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="264dp"
+        android:transitionName="@string/shared_player"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
         android:id="@+id/test_start"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/background_player"
+        android:background="@drawable/background_gradient"
         android:clickable="true"
-        android:src="@drawable/ic_test"
         android:transitionName="@string/shared_image"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

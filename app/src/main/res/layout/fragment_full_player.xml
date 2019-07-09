@@ -3,26 +3,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.exoplayer2.ui.PlayerView
-        android:id="@+id/player_view"
+    <com.example.paginationpolygon.matrix.PlayerTextureView
+        android:id="@+id/texture_end"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:background="@drawable/background_player"
         android:transitionName="@string/shared_player"
-        app:resize_mode="zoom"
-        app:use_controller="false" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
+    <View
         android:id="@+id/test_end"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="146dp"
+        android:layout_height="226dp"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
+        android:background="@drawable/background_gradient"
         android:clickable="true"
-        android:src="@drawable/ic_test"
         android:transitionName="@string/shared_image"
-        app:layout_constraintBottom_toBottomOf="@+id/player_view"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="visible"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

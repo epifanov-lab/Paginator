@@ -1,4 +1,4 @@
-package com.example.paginationpolygon.old.gleb;
+package com.example.paginationpolygon.draft;
 
 import android.os.Bundle;
 import android.view.View;

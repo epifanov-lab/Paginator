@@ -3,29 +3,25 @@ package com.example.paginationpolygon.player;
 import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.TextureView;
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.paginationpolygon.MainActivity;
+import com.example.paginationpolygon.PagerFragment;
 import com.example.paginationpolygon.R;
 import com.example.paginationpolygon.utills.OnSwipeTouchListener;
 import com.example.paginationpolygon.utills.RecyclerTouchHelper;
 import com.example.paginationpolygon.utills.Utils;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.hls.DefaultHlsExtractorFactory;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 
 import java.util.List;
 
@@ -58,10 +54,13 @@ public class PlayersTabView extends ConstraintLayout {
   private RecyclerView mRecyclerUrls;
 
   private View mContainerMain;
+  private View mPlayerContainer;
+
+  private TextureView mTextureView1;
 
   private PlayerPresenter mPresenter;
 
-  private ImageView test;
+  private View test;
 
   public PlayersTabView(Context context) {
     this(context, null);
@@ -89,6 +88,10 @@ public class PlayersTabView extends ConstraintLayout {
     currentPlayer = mPlayerView_1;
 
     mContainerMain = this.findViewById(R.id.container_player_main);
+    mPlayerContainer = this.findViewById(R.id.player_container);
+    mTextureView1 = this.findViewById(R.id.texture_1);
+
+    ExoHolder.get(getContext()).setVideoTextureView(mTextureView1);
 
     test = this.findViewById(R.id.test_start);
 
@@ -120,23 +123,6 @@ public class PlayersTabView extends ConstraintLayout {
 
   }
 
-  private void initializePlayer(PlayerView playerView, String url) {
-
-    if (url != null) {
-      MediaSource mediaSource = buildMediaSource(getContext(), Uri.parse(url));
-      ExoHolder.get(getContext()).prepare(mediaSource, true, false);
-    }
-
-    playerView.setPlayer(ExoHolder.get(getContext()));
-  }
-
-  private MediaSource buildMediaSource(Context context, Uri uri) {
-    return new HlsMediaSource
-      .Factory(new DefaultHttpDataSourceFactory(Util.getUserAgent(context, "polygon")))
-      .setExtractorFactory(new DefaultHlsExtractorFactory())
-      .createMediaSource(uri);
-  }
-
   private void releasePlayer() {
     /*if (ExoHolder.get(getContext()) != null) {
       ExoHolder.get(getContext()).stop();
@@ -147,7 +133,8 @@ public class PlayersTabView extends ConstraintLayout {
 
   public void onClickUrl(String url) {
     System.out.println("URL: " + url);
-    initializePlayer(currentPlayer, url);
+    ExoHolder.get(getContext(), url);
+    //mPlayerView_2.setPlayer(ExoHolder.get(getContext(), url));
   }
 
   public void onClickStart() {
@@ -161,11 +148,13 @@ public class PlayersTabView extends ConstraintLayout {
   }
 
   public void onClickBigger() {
-    changeSize(mPlayerView_2, 1.1f);
+    //changeSize(mPlayerView_2, 1.1f);
+    changeSize(mTextureView1, 1.1f);
   }
 
   public void onClickSmaller() {
-    changeSize(mPlayerView_2, 0.9f);
+    //changeSize(mPlayerView_2, 0.9f);
+    changeSize(mTextureView1, 0.9f);
   }
 
   public void onClickScale(boolean bigger) {
@@ -214,7 +203,8 @@ public class PlayersTabView extends ConstraintLayout {
   }
 
   public void startFullPlayerActivity() {
-    ((MainActivity) getContext()).goToNextFragment(mPlayerView_2, test);
+    Fragment host = ((MainActivity) getContext()).getSupportFragmentManager().findFragmentByTag(PagerFragment.class.getSimpleName());
+    ((MainActivity) getContext()).goToFull(host, mTextureView1, test);
   }
 
   private void scaleToFullScreen(Runnable endCallback) {
@@ -248,6 +238,9 @@ public class PlayersTabView extends ConstraintLayout {
   @Override
   protected void onAttachedToWindow() {
     super.onAttachedToWindow();
-    mPlayerView_2.setPlayer(ExoHolder.get(getContext()));
+    /*if (ExoHolder.get(getContext()) != null) {
+      ExoHolder.get(getContext()).setVideoTextureView(mTextureView1);
+    }*/
+      //mPlayerView_2.setPlayer(ExoHolder.get(getContext()));
   }
 }

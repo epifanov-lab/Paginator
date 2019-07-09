@@ -1,4 +1,4 @@
-package com.example.paginationpolygon.player;
+package com.example.paginationpolygon.draft;
 
 import android.content.Context;
 import android.transition.ChangeBounds;
