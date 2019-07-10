@@ -3,6 +3,7 @@ package com.example.paginationpolygon.pagination;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -37,6 +38,8 @@ public class ItemView extends RelativeLayout implements Consumer<Item>, Runnable
   private ViewGroup mContainerItem;
   private TextView mTextView;
 
+  private boolean isActive = false;
+
   public ItemView(Context context) {
     this(context, null);
   }
@@ -66,7 +69,6 @@ public class ItemView extends RelativeLayout implements Consumer<Item>, Runnable
     mContainerItem = findViewById(R.id.container_item);
     mTextView = findViewById(R.id.text_item);
   }
-
   @Override
   public void accept(Item item) {
     //System.out.println("ItemView.accept: " + hashCode() + " || item: " + item.getId());
@@ -79,4 +81,18 @@ public class ItemView extends RelativeLayout implements Consumer<Item>, Runnable
     //System.out.println("ItemView.onUnbind: " + this.hashCode());
   }
 
+  public void setActive(boolean state) {
+    // TODO ОЧЕНЬ ОПТИМИЗИРОВАННЫЙ МЕТОД
+    if (state == isActive) return;
+    isActive = state;
+    mTextView.setBackgroundColor(isActive ? Color.BLUE : Color.GRAY);
+  }
+
+  public void showWindowYPos() {
+    int[] pos = new int[2];
+    getLocationInWindow(pos);
+    int y = pos[1];
+    int cy = y + getHeight() / 2;
+    mTextView.setText(String.format("y[%d] cy[%d]", y, cy));
+  }
 }

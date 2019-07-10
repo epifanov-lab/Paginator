@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
     getSupportFragmentManager().beginTransaction()
       .replace(R.id.fragment_container,
-        CardFragment.newInstance(),
-        CardFragment.class.getSimpleName())
+        PagerFragment.newInstance(),
+        PagerFragment.class.getSimpleName())
       .commit();
   }
 
