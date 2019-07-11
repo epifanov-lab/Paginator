@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.example.paginationpolygon.matrix.PlayerTextureView
+    <com.example.paginationpolygon.pagination.PlayerTextureView
         android:id="@+id/texture_end"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

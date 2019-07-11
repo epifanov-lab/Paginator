@@ -3,13 +3,15 @@ package com.example.paginationpolygon.player;
 import androidx.annotation.NonNull;
 
 import com.example.paginationpolygon.DataService;
+import com.example.paginationpolygon.pagination.UrlHolder;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.ArrayList;
 
 import reactor.core.Disposable;
 import reactor.core.Disposables;
 import reactor.core.publisher.Flux;
+
+import static com.example.paginationpolygon.DataService.urls;
 
 /**
  * @author Konstantin Epifanov
@@ -23,53 +25,25 @@ public class PlayerPresenter implements Disposable {
   /** Data Service. */
   private final DataService mDataService;
 
-  private List<String> urls = Arrays.asList(
-    "https://media.webka.com/hls/live/master/1562079961.m3u8",
-    "https://media.webka.com/hls/vod/40.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/39.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/38.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/37.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/36.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/35.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/34.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/33.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/32.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/31.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/30.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/29.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/28.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/27.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/26.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/25.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/24.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/23.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/22.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/21.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/20.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/19.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/18.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/17.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/16.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/15.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/14.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/13.mp4/index.m3u8",
-    "https://media.webka.com/hls/vod/12.mp4/index.m3u8"
-  );
-
   private boolean bigger = true;
 
   /** Default constructor. */
   PlayerPresenter(@NonNull PlayersTabView view) {
 
+    ArrayList<String> urlList = new ArrayList<>();
+    urls.stream()
+      .map(UrlHolder::getVideoUrl)
+      .forEach(urlList::add);
+
     mDataService = new DataService();
 
     mDisposable = Disposables.composite(
 
-      Flux.just(urls)
+      Flux.just(urlList)
         .subscribe(view::submitUrls),
 
       view.mUrlClicks
-        .subscribe(i -> view.onClickUrl(urls.get(i))),
+        .subscribe(i -> view.onClickUrl(urls.get(i).getVideoUrl())),
 
       view.mFluxRestart
         .doOnNext(o -> view.restart())

@@ -228,6 +228,7 @@ public class DrawableTarget extends Drawable implements Target<Bitmap> {
   /** {@inheritDoc} */
   @Override
   public void onLoadStarted(@Nullable Drawable drawable) {
+    System.out.println("DrawableTarget.onLoadStarted");
     mFirstShow = true;
   }
 
@@ -235,6 +236,7 @@ public class DrawableTarget extends Drawable implements Target<Bitmap> {
   @Override
   public final void
   onLoadFailed(@Nullable Drawable drawable) {
+    System.out.println("DrawableTarget.onLoadFailed");
     onLoadCleared(drawable);
   }
 
@@ -242,7 +244,7 @@ public class DrawableTarget extends Drawable implements Target<Bitmap> {
   @Override
   public final void onResourceReady
   (@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-
+    System.out.println("DrawableTarget.onResourceReady");
     resource.prepareToDraw();
     mPaint
       .setShader(new BitmapShader(resource))
@@ -266,6 +268,7 @@ public class DrawableTarget extends Drawable implements Target<Bitmap> {
   /** {@inheritDoc} */
   @Override
   public final void onLoadCleared(@Nullable Drawable placeholder) {
+    System.out.println("DrawableTarget.onLoadCleared");
     final BitmapShader shader = (BitmapShader) mPaint.getShader();
     if (shader == null) return;
     mPaint.setShader(null);

@@ -1,24 +1,57 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.example.paginationpolygon.pagination.PlayerCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container_item"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="350dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginTop="16dp"
+    android:layout_marginRight="16dp"
+    android:clickable="true"
+    android:clipChildren="true"
+    android:focusable="true"
+    android:foreground="@drawable/ripple"
+    android:foregroundGravity="fill"
     android:orientation="vertical"
-    android:elevation="4dp">
+    android:stateListAnimator="@drawable/card_statelist_animator">
 
-    <com.example.paginationpolygon.matrix.PlayerTextureView
+    <com.example.paginationpolygon.pagination.PlayerTextureView
         android:id="@+id/texture"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <TextView
-        android:id="@+id/label_user_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="24dp"
-        android:textColor="@android:color/holo_red_light"
-        android:textSize="16sp"
-        android:text="TextText\n@TextText" />
+    <RelativeLayout
+        android:id="@+id/container_ui"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/label_user_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="24dp"
+            android:textColor="#fff"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="TextText\n@TextText" />
+
+    </RelativeLayout>
+
+</com.example.paginationpolygon.pagination.PlayerCardView>
+
+    <!--
+
+    <style name="Widget.Material.Button">
+    <item name="background">@drawable/btn_default_material</item>
+    <item name="textAppearance">?attr/textAppearanceButton</item>
+    <item name="minHeight">48dip</item>
+    <item name="minWidth">88dip</item>
+    <item name="stateListAnimator">@anim/button_state_list_anim_material</item>
+    <item name="focusable">true</item>
+    <item name="clickable">true</item>
+    <item name="gravity">center_vertical|center_horizontal</item>
+    </style>
+
+    -->

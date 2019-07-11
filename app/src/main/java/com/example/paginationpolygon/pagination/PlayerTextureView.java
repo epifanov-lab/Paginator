@@ -1,19 +1,15 @@
-package com.example.paginationpolygon.matrix;
+package com.example.paginationpolygon.pagination;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.TextureView;
 
-import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.StyleRes;
-import androidx.annotation.StyleableRes;
 
 /**
  * @author Konstantin Epifanov
@@ -36,7 +32,13 @@ public class PlayerTextureView extends TextureView {
   @Override
   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
-    System.out.println("onSizeChanged: w = [" + w + "], h = [" + h + "], oldw = [" + oldw + "], oldh = [" + oldh + "]");
+
+    Matrix old = getTransform(null);
+    matrix(old, new PointF(1920, 1280), new PointF(w, h));
+
+    setTransform(old);
+
+    System.out.println("w = [" + w + "], h = [" + h + "], oldw = [" + oldw + "], oldh = [" + oldh + "]");
   }
 
   @Override
@@ -47,7 +49,34 @@ public class PlayerTextureView extends TextureView {
   @Override
   public void setBackground(Drawable background) {
     super.setBackground(background);
+  }
 
+
+  @NonNull
+  static void matrix(Matrix matrix, @NonNull PointF src, @NonNull PointF dst) {
+
+      final float
+        sw = src.x,
+        sh = src.y,
+        dw = dst.x,
+        dh = dst.y;
+
+      float scale, dx = 0, dy = 0;
+
+      if (sw * dh > dw * sh) {
+        scale = dh / sh;
+        dx = (dw - sw * scale) * 0.5f;
+      } else {
+        scale = dw / sw;
+        dy = (dh - sh * scale) * 0.5f;
+      }
+
+
+      matrix.setScale(scale, scale);
+      matrix.postTranslate(dx, dy);
+
+    System.out.println("PlayerTextureView.matrix " + scale);
+    System.out.println("PlayerTextureView.matrix " + dx + " " + dy);
   }
 
   /**

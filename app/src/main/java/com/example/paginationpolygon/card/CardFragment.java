@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.paginationpolygon.MainActivity;
 import com.example.paginationpolygon.R;
+import com.example.paginationpolygon.pagination.PlayerCardView;
 import com.example.paginationpolygon.player.ExoHolder;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -19,6 +20,8 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+
+import static com.example.paginationpolygon.utills.Utils.getRandomImageUrl;
 
 /**
  * @author Konstantin Epifanov
@@ -153,12 +156,6 @@ public class CardFragment extends Fragment {
 
   private void button_restart() {
     ((MainActivity) getActivity()).restart();
-  }
-
-  /** Returns random dummy image URL */
-  private String getRandomImageUrl(int pagingOffset) {
-    pagingOffset += 10;
-    return "https://picsum.photos/id/" + pagingOffset + "/600/800";
   }
 
 }

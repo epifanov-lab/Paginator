@@ -7,7 +7,6 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -15,7 +14,7 @@ import androidx.core.app.SharedElementCallback;
 import androidx.fragment.app.Fragment;
 
 import com.example.paginationpolygon.R;
-import com.example.paginationpolygon.matrix.PlayerTextureView;
+import com.example.paginationpolygon.pagination.PlayerTextureView;
 
 import java.util.List;
 import java.util.Map;

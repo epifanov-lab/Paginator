@@ -17,10 +17,16 @@ public class Item implements Cloneable {
   private String text;
   private int color;
 
-  public Item(String id, int position) {
+  private String url;
+  private String backgroundUrl;
+
+  public Item(String id, int position, UrlHolder url) {
     this.id = id;
     this.hash = id.hashCode();
     this.position = position;
+
+    this.url = url.getVideoUrl();
+    this.backgroundUrl = url.getScreenshotUrl();
 
     this.text = "id:" + id + " - pos:" + position;
     color = Color.GRAY;
@@ -45,15 +51,15 @@ public class Item implements Cloneable {
     return text;
   }
 
-  void setText(String text) {
+  public void setText(String text) {
     this.text = text;
   }
 
-  String getId() {
+  public String getId() {
     return id;
   }
 
-  int getHash() {
+  public int getHash() {
     return hash;
   }
 
@@ -61,12 +67,20 @@ public class Item implements Cloneable {
     return color;
   }
 
-  void setColor(int color) {
+  public void setColor(int color) {
     this.color = color;
   }
 
-  int getPosition() {
+  public int getPosition() {
     return position;
+  }
+
+  public String getUrl() {
+    return url;
+  }
+
+  public String getBackgroundUrl() {
+    return backgroundUrl;
   }
 
   @Override
@@ -77,6 +91,8 @@ public class Item implements Cloneable {
       ", position=" + position +
       ", text='" + text + '\'' +
       ", color=" + color +
+      ", url='" + url + '\'' +
+      ", backgroundUrl='" + backgroundUrl + '\'' +
       '}';
   }
 }

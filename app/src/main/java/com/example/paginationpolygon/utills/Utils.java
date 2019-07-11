@@ -30,6 +30,12 @@ import reactor.core.publisher.Flux;
  */
 public class Utils {
 
+  /** Returns random dummy image URL */
+  public static String getRandomImageUrl(int pagingOffset) {
+    pagingOffset += 10;
+    return "https://picsum.photos/id/" + pagingOffset + "/600/800";
+  }
+
   public static Flux<View> toFlux(View view) {
     return Flux.create(sink -> {
       view.setOnClickListener(sink::next);
@@ -128,11 +134,6 @@ public class Utils {
         return super.getItem(position);
       }
 
-      @Override
-      public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
-        ((Runnable) holder.itemView).run();
-        super.onViewRecycled(holder);
-      }
     };
   }
 

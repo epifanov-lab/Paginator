@@ -1,29 +1,31 @@
-package com.example.paginationpolygon.card;
+package com.example.paginationpolygon.pagination;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.TextureView;
-import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.example.paginationpolygon.R;
+import com.example.paginationpolygon.player.ExoHolder;
 import com.example.paginationpolygon.utills.DrawableTarget;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+
+import java.util.function.Consumer;
 
 /**
  * @author Konstantin Epifanov
  * @since 09.07.2019
  */
-public class PlayerCardView extends RelativeLayout {
+public class PlayerCardView extends FrameLayout implements Consumer<Item> {
 
-  private SimpleExoPlayer mPlayer;
   private TextureView mTextureView;
-
   private TextView mLabelView;
-
   private DrawableTarget background;
+
+  private Item data = null;
+  private boolean isActive = false;
 
   public PlayerCardView(Context context) {
     this(context, null);
@@ -36,23 +38,21 @@ public class PlayerCardView extends RelativeLayout {
   public PlayerCardView(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
 
-    System.out.println("PlayerCardView.PlayerCardView");
-
-    LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    inflater.inflate(R.layout.item_player_card, this, true);
-    mTextureView = findViewById(R.id.texture);
-    mLabelView = findViewById(R.id.label_user_info);
-
     background = new DrawableTarget(getResources(), 16, -1, -1, Color.GREEN);
     setBackground(background);
 
-    //mTextureView.setOpaque(false);
+    setClipToOutline(true);
+  }
 
+  @Override
+  protected void onFinishInflate() {
+    super.onFinishInflate();
+    mTextureView = findViewById(R.id.texture);
+    mLabelView = findViewById(R.id.label_user_info);
   }
 
   public void setImageBackground(String url) {
     background.setData(url.getBytes());
-    mLabelView.setText(url);
   }
 
   public void setPlayer(SimpleExoPlayer player) {
@@ -60,11 +60,22 @@ public class PlayerCardView extends RelativeLayout {
       player.setVideoTextureView(mTextureView);
       mTextureView.animate().alpha(1f).setDuration(300);
     } else {
-      //if (mPlayer != null) mPlayer.setVideoTextureView(null);
       mTextureView.animate().alpha(0f).setDuration(300);
     }
-
-    mPlayer = player;
   }
 
+  public void setActive(boolean state) {
+    // TODO ОЧЕНЬ ОПТИМИЗИРОВАННЫЙ МЕТОД
+    if (state == isActive) return;
+    isActive = state;
+    setPlayer(isActive ? ExoHolder.get(getContext(), data.getUrl()) : null);
+  }
+
+  @Override
+  public void accept(Item item) {
+    System.out.println("data = [" + item + "]");
+    this.data = item;
+    mLabelView.setText(String.format("pos[%s]\nurl[%s]", item.getText(), item.getUrl()));
+    setImageBackground(item.getBackgroundUrl());
+  }
 }
