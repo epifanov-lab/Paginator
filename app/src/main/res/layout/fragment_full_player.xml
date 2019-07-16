@@ -24,6 +24,6 @@
         android:transitionName="@string/shared_image"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:visibility="visible"/>
+        android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

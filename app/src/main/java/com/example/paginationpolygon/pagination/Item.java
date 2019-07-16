@@ -2,6 +2,8 @@ package com.example.paginationpolygon.pagination;
 
 import android.graphics.Color;
 
+import com.example.paginationpolygon.DataService;
+
 import java.util.Objects;
 
 /**
@@ -20,7 +22,7 @@ public class Item implements Cloneable {
   private String url;
   private String backgroundUrl;
 
-  public Item(String id, int position, UrlHolder url) {
+  public Item(String id, int position, DataService.UrlHolder url) {
     this.id = id;
     this.hash = id.hashCode();
     this.position = position;

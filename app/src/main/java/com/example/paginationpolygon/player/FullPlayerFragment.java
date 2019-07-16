@@ -14,7 +14,10 @@ import androidx.core.app.SharedElementCallback;
 import androidx.fragment.app.Fragment;
 
 import com.example.paginationpolygon.R;
+import com.example.paginationpolygon.draft.PlayerTextureView2;
 import com.example.paginationpolygon.pagination.PlayerTextureView;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.video.VideoListener;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +33,9 @@ public class FullPlayerFragment extends Fragment {
   private View mImageTest;
 
   private PlayerTextureView mTextureView;
+
+  private static final Runnable DUMMY_CLEANER = () -> { };
+  private Runnable cleaner = DUMMY_CLEANER;
 
   public static FullPlayerFragment newInstance() {
     return new FullPlayerFragment();
@@ -154,19 +160,47 @@ public class FullPlayerFragment extends Fragment {
     return root;
   }
 
+  public void setPlayer(SimpleExoPlayer player) {
+    clean();
+
+    if (player != null) {
+
+      VideoListener listener = new VideoListener() {
+        @Override
+        public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+          mTextureView.initialize(width, height);
+        }
+      };
+
+      player.addVideoListener(listener);
+
+      player.setVideoTextureView(mTextureView);
+      mTextureView.animate().alpha(1f).setDuration(300);
+
+      cleaner = () -> {
+        player.removeVideoListener(listener);
+        mTextureView.animate().alpha(0f).setDuration(300);
+      };
+    }
+  }
+
+  private void clean() {
+    cleaner.run();
+    cleaner = DUMMY_CLEANER;
+  }
+
   @Override
   public void onStart() {
     super.onStart();
     System.out.println("FullPlayerFragment.onStart");
-    //mPlayerView.setPlayer(ExoHolder.get(getContext()));
+    setPlayer(ExoHolder.get(getContext()));
   }
 
   @Override
   public void onResume() {
     super.onResume();
     System.out.println("FullPlayerFragment.onResume");
-    //mPlayerView.setPlayer(ExoHolder.get(getContext()));
-    ExoHolder.get(getContext(), null).setVideoTextureView(mTextureView);
+
   }
 
   @Override

@@ -12,6 +12,13 @@ import java.util.function.Consumer;
  */
 public final class RatioKeeper {
 
+  private static final int VIDEO_WIDTH = 0;
+  private static final int VIDEO_HEIGHT = 1;
+  private static final int VIEW_WIDTH = 2;
+  private static final int VIEW_HEIGHT = 3;
+  private static final int SCALE_X = 4;
+  private static final int SCALE_Y = 5;
+
   /** Transformation Matrix. */
   private final Matrix mMatrix = new Matrix();
 
@@ -36,9 +43,9 @@ public final class RatioKeeper {
    * @param height video height
    */
   public final void videoSize(int width, int height) {
-    if ((int) mSizes[0] != width || (int) mSizes[1] != height) {
-      mSizes[0] = width;
-      mSizes[1] = height;
+    if ((int) mSizes[VIDEO_WIDTH] != width || (int) mSizes[VIDEO_HEIGHT] != height) {
+      mSizes[VIDEO_WIDTH] = width;
+      mSizes[VIDEO_HEIGHT] = height;
       invalidate();
     }
   }
@@ -48,25 +55,25 @@ public final class RatioKeeper {
    * @param height view height
    */
   public final void viewPort(int width, int height) {
-    if ((int) mSizes[2] != width || (int) mSizes[3] != height) {
-      mSizes[2] = width;
-      mSizes[3] = height;
+    if ((int) mSizes[VIEW_WIDTH] != width || (int) mSizes[VIEW_HEIGHT] != height) {
+      mSizes[VIEW_WIDTH] = width;
+      mSizes[VIEW_HEIGHT] = height;
       invalidate();
     }
   }
 
   /** @param value horizontal scale */
   public final void scaleX(float value) {
-    if (mSizes[4] != value) {
-      mSizes[4] = value;
+    if (mSizes[SCALE_X] != value) {
+      mSizes[SCALE_X] = value;
       invalidate();
     }
   }
 
   /** @param value vertical scale */
   public final void scaleY(float value) {
-    if (mSizes[5] != value) {
-      mSizes[5] = value;
+    if (mSizes[SCALE_Y] != value) {
+      mSizes[SCALE_Y] = value;
       invalidate();
     }
   }
@@ -76,27 +83,27 @@ public final class RatioKeeper {
 
     // Backup sizes before fit
     final float
-      videoWidth = mSizes[0],
-      videoHeight = mSizes[1],
-      viewWidth = mSizes[2],
-      viewHeight = mSizes[3];
+      videoWidth = mSizes[VIDEO_WIDTH],
+      videoHeight = mSizes[VIDEO_HEIGHT],
+      viewWidth = mSizes[VIEW_WIDTH],
+      viewHeight = mSizes[VIEW_HEIGHT];
 
     // Calc fitting for matrix
     fit(mSizes);
 
     // Apply fitting on matrix
     mMatrix.setScale(
-      mSizes[0],
-      mSizes[1],
-      mSizes[2],
-      mSizes[3]
+      mSizes[VIDEO_WIDTH],
+      mSizes[VIDEO_HEIGHT],
+      mSizes[VIEW_WIDTH],
+      mSizes[VIEW_HEIGHT]
     );
 
     // Restore sizes back to transform params
-    mSizes[0] = videoWidth;
-    mSizes[1] = videoHeight;
-    mSizes[2] = viewWidth;
-    mSizes[3] = viewHeight;
+    mSizes[VIDEO_WIDTH] = videoWidth;
+    mSizes[VIDEO_HEIGHT] = videoHeight;
+    mSizes[VIEW_WIDTH] = viewWidth;
+    mSizes[VIEW_HEIGHT] = viewHeight;
 
     // Apply new modified matrix for rendering
     mApplier.accept(mMatrix);
@@ -104,15 +111,16 @@ public final class RatioKeeper {
 
   /** @param value floats container */
   private static void fit(float[] value) {
-    float
-      a = value[0] * value[3],
-      b = value[2] * value[1];
-    value[0] = value[4];
-    value[1] = value[5];
-    value[2] *= 0.5f;
-    value[3] *= 0.5f;
-    if (a > b)
-      value[0] = a / b;
-    else value[1] = b / a;
+    float a = value[VIDEO_WIDTH] * value[VIEW_HEIGHT];
+    float b = value[VIDEO_HEIGHT] * value[VIEW_WIDTH];
+
+    value[VIDEO_WIDTH] = value[SCALE_X];
+    value[VIDEO_HEIGHT] = value[SCALE_Y];
+
+    value[VIEW_WIDTH] *= 0.5f;
+    value[VIEW_HEIGHT] *= 0.5f;
+
+    if (a > b) value[VIDEO_WIDTH] = a / b;
+    else value[VIDEO_HEIGHT] = b / a;
   }
 }

@@ -4,21 +4,26 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Checkable;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
 import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.paginationpolygon.MainActivity;
+import com.example.paginationpolygon.PagerFragment;
 import com.example.paginationpolygon.R;
 import com.example.paginationpolygon.utills.ChildViews;
+import com.example.paginationpolygon.utills.RecyclerTouchHelper;
 import com.example.paginationpolygon.utills.Utils;
 
 import java.util.Comparator;
 
+import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.Flux;
 
 import static com.example.paginationpolygon.utills.Utils.toFlux;
@@ -36,6 +41,27 @@ public class PaginationTabView extends ConstraintLayout {
   private RecyclerView mRecycler;
   private View mProgress;
   private PaginationPresenter mPresenter;
+
+  private static Checkable DUMMY_CHECKABLE = new Checkable() {
+    @Override
+    public void setChecked(boolean checked) {
+
+    }
+
+    @Override
+    public boolean isChecked() {
+      return false;
+    }
+
+    @Override
+    public void toggle() {
+
+    }
+  };
+
+  private Checkable mActiveCard = DUMMY_CHECKABLE;
+
+  public DirectProcessor<Integer> mRecyclerClicks = DirectProcessor.create();
 
   public PaginationTabView(Context context) {
     this(context, null);
@@ -67,6 +93,7 @@ public class PaginationTabView extends ConstraintLayout {
 
     mRecycler = this.findViewById(R.id.recycler);
     mRecycler.setAdapter(Utils.getPagedAdapter(LayoutInflater.from(getContext()), R.layout.item_player_card));
+
     mRecycler.setLayoutManager(new LinearLayoutManager(getContext()) {
       @Override
       public boolean supportsPredictiveItemAnimations() {
@@ -94,12 +121,19 @@ public class PaginationTabView extends ConstraintLayout {
 
         ChildViews.parallel(mRecycler)
           .min(minDistComparator(recyclerCY))
-          .ifPresent(closest ->
-            ChildViews.sequential(mRecycler).forEach(current ->
-              ((PlayerCardView) current).setActive(closest == current)));
+          .ifPresent(closest -> setActiveCard((Checkable) closest));
       }
     });
 
+    //new RecyclerTouchHelper(mRecycler, mRecyclerClicks::onNext);
+  }
+
+  private void setActiveCard(Checkable v) {
+    if (mActiveCard == v) return;
+    ChildViews.sequential(mRecycler).forEach(current ->
+      ((Checkable) current).setChecked(v == current));
+    v.setChecked(true);
+    mActiveCard = v;
   }
 
   private Comparator<View> minDistComparator(int target) {
@@ -135,6 +169,13 @@ public class PaginationTabView extends ConstraintLayout {
 
   public void showLoadingIndicator(boolean show) {
     mProgress.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+  }
+
+  public void goToFull(View v) {
+    Fragment host = ((MainActivity) getContext()).getSupportFragmentManager().findFragmentByTag(PagerFragment.class.getSimpleName());
+    PlayerCardView view = (PlayerCardView) v;
+    view.getTextureView().setTransitionName(getResources().getString(R.string.shared_player));
+    ((MainActivity) getContext()).goToFull(host, view.getTextureView());
   }
 
   public void restart() {

@@ -18,10 +18,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.paginationpolygon.MainActivity;
 import com.example.paginationpolygon.PagerFragment;
 import com.example.paginationpolygon.R;
+import com.example.paginationpolygon.pagination.PlayerTextureView;
 import com.example.paginationpolygon.utills.OnSwipeTouchListener;
 import com.example.paginationpolygon.utills.RecyclerTouchHelper;
 import com.example.paginationpolygon.utills.Utils;
+import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.video.VideoListener;
 
 import java.util.List;
 
@@ -56,11 +59,14 @@ public class PlayersTabView extends ConstraintLayout {
   private View mContainerMain;
   private View mPlayerContainer;
 
-  private TextureView mTextureView1;
+  private PlayerTextureView mTextureView1;
 
   private PlayerPresenter mPresenter;
 
   private View test;
+
+  private static final Runnable DUMMY_CLEANER = () -> { };
+  private Runnable cleaner = DUMMY_CLEANER;
 
   public PlayersTabView(Context context) {
     this(context, null);
@@ -90,8 +96,6 @@ public class PlayersTabView extends ConstraintLayout {
     mContainerMain = this.findViewById(R.id.container_player_main);
     mPlayerContainer = this.findViewById(R.id.player_container);
     mTextureView1 = this.findViewById(R.id.texture_1);
-
-    ExoHolder.get(getContext()).setVideoTextureView(mTextureView1);
 
     test = this.findViewById(R.id.test_start);
 
@@ -123,18 +127,17 @@ public class PlayersTabView extends ConstraintLayout {
 
   }
 
-  private void releasePlayer() {
-    /*if (ExoHolder.get(getContext()) != null) {
-      ExoHolder.get(getContext()).stop();
-      ExoHolder.get(getContext()).release();
-      ExoHolder.get(getContext()) = null;
-    }*/
+  @Override
+  protected void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    setPlayer(ExoHolder.get(getContext()));
   }
 
   public void onClickUrl(String url) {
     System.out.println("URL: " + url);
-    ExoHolder.get(getContext(), url);
+    //ExoHolder.get(getContext(), url);
     //mPlayerView_2.setPlayer(ExoHolder.get(getContext(), url));
+    setPlayer(ExoHolder.get(getContext(), url));
   }
 
   public void onClickStart() {
@@ -235,12 +238,32 @@ public class PlayersTabView extends ConstraintLayout {
       });
   }
 
-  @Override
-  protected void onAttachedToWindow() {
-    super.onAttachedToWindow();
-    /*if (ExoHolder.get(getContext()) != null) {
-      ExoHolder.get(getContext()).setVideoTextureView(mTextureView1);
-    }*/
-      //mPlayerView_2.setPlayer(ExoHolder.get(getContext()));
+  public void setPlayer(SimpleExoPlayer player) {
+    clean();
+
+    if (player != null) {
+
+      VideoListener listener = new VideoListener() {
+        @Override
+        public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+          mTextureView1.initialize(width, height);
+        }
+      };
+
+      player.addVideoListener(listener);
+
+      player.setVideoTextureView(mTextureView1);
+      mTextureView1.animate().alpha(1f).setDuration(300);
+
+      cleaner = () -> {
+        player.removeVideoListener(listener);
+        mTextureView1.animate().alpha(0f).setDuration(300);
+      };
+    }
+  }
+
+  private void clean() {
+    cleaner.run();
+    cleaner = DUMMY_CLEANER;
   }
 }

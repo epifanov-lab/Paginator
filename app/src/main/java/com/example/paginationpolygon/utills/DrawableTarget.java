@@ -245,6 +245,7 @@ public class DrawableTarget extends Drawable implements Target<Bitmap> {
   public final void onResourceReady
   (@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
     System.out.println("DrawableTarget.onResourceReady");
+    System.out.println("mFirstShow = " + mFirstShow + " resource = [" + resource + "], transition = [" + transition + "]");
     resource.prepareToDraw();
     mPaint
       .setShader(new BitmapShader(resource))

@@ -1,4 +1,4 @@
-package com.example.paginationpolygon.pagination;
+package com.example.paginationpolygon.draft;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -14,6 +14,7 @@ import androidx.annotation.StyleRes;
 import androidx.annotation.StyleableRes;
 
 import com.example.paginationpolygon.R;
+import com.example.paginationpolygon.pagination.Item;
 
 import java.util.function.Consumer;
 

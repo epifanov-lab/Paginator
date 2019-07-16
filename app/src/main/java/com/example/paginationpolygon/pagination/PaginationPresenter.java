@@ -63,7 +63,11 @@ public class PaginationPresenter implements Disposable {
 
       view.mFluxChange
         .doOnNext(o -> mDataService.changeItem())
-        .subscribe()
+        .subscribe(),
+
+      view.mRecyclerClicks
+        .subscribe(/*view::goToFull*/)
+
     );
   }
 

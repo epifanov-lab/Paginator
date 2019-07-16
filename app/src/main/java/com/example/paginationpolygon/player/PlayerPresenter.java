@@ -3,7 +3,6 @@ package com.example.paginationpolygon.player;
 import androidx.annotation.NonNull;
 
 import com.example.paginationpolygon.DataService;
-import com.example.paginationpolygon.pagination.UrlHolder;
 
 import java.util.ArrayList;
 
@@ -32,7 +31,7 @@ public class PlayerPresenter implements Disposable {
 
     ArrayList<String> urlList = new ArrayList<>();
     urls.stream()
-      .map(UrlHolder::getVideoUrl)
+      .map(DataService.UrlHolder::getVideoUrl)
       .forEach(urlList::add);
 
     mDataService = new DataService();

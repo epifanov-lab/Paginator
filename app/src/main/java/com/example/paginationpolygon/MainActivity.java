@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     transaction.replace(R.id.fragment_container, fragment);
 
     for (View v : shared) {
+      System.out.println("MainActivity.goToFull " + v.getTransitionName());
       transaction.addSharedElement(v, v.getTransitionName());
     }
 

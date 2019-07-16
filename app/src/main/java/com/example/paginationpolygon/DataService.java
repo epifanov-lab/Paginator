@@ -1,7 +1,6 @@
 package com.example.paginationpolygon;
 
 import com.example.paginationpolygon.pagination.Item;
-import com.example.paginationpolygon.pagination.UrlHolder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,4 +88,25 @@ public class DataService {
     mPaginationList.set(2, "CHANGED");
   }
 
+  /**
+   * @author Konstantin Epifanov
+   * @since 10.07.2019
+   */
+  public static class UrlHolder {
+    private String videoUrl;
+    private String screenshotUrl;
+
+    public UrlHolder(String videoUrl, String screenshotUrl) {
+      this.videoUrl = videoUrl;
+      this.screenshotUrl = screenshotUrl;
+    }
+
+    public String getVideoUrl() {
+      return videoUrl;
+    }
+
+    public String getScreenshotUrl() {
+      return screenshotUrl;
+    }
+  }
 }

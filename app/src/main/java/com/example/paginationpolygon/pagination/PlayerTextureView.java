@@ -1,21 +1,16 @@
 package com.example.paginationpolygon.pagination;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Matrix;
-import android.graphics.PointF;
-import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.TextureView;
 
-import androidx.annotation.NonNull;
+import com.example.paginationpolygon.utills.RatioKeeper;
 
-/**
- * @author Konstantin Epifanov
- * @since 04.07.2019
- */
-public class PlayerTextureView extends TextureView {
+public final class PlayerTextureView extends TextureView {
+
+  /** Aspect Ratio Keeper. */
+  private final RatioKeeper mRatioKeeper =
+    new RatioKeeper(this::setTransform);
 
   public PlayerTextureView(Context context) {
     super(context);
@@ -29,84 +24,30 @@ public class PlayerTextureView extends TextureView {
     super(context, attrs, defStyleAttr);
   }
 
-  @Override
-  protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-    super.onSizeChanged(w, h, oldw, oldh);
-
-    Matrix old = getTransform(null);
-    matrix(old, new PointF(1920, 1280), new PointF(w, h));
-
-    setTransform(old);
-
-    System.out.println("w = [" + w + "], h = [" + h + "], oldw = [" + oldw + "], oldh = [" + oldh + "]");
+  public PlayerTextureView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    super(context, attrs, defStyleAttr, defStyleRes);
   }
 
-  @Override
-  public void setBackgroundDrawable(Drawable background) {
-    super.setBackgroundDrawable(background);
+  public void initialize(int width, int height) {
+    mRatioKeeper.videoSize(width, height);
   }
 
-  @Override
-  public void setBackground(Drawable background) {
-    super.setBackground(background);
+  /** {@inheritDoc} */
+  @Override protected final void onSizeChanged(int nw, int nh, int ow, int oh) {
+    mRatioKeeper.viewPort(nw, nh);
+    super.onSizeChanged(nw, nh, ow, oh);
+  }
+
+  /** {@inheritDoc} */
+  @Override public final void setScaleX(float value) {
+    mRatioKeeper.scaleX(value);
+    super.setScaleX(value);
+  }
+
+  @Override public final void setScaleY(float value) {
+    mRatioKeeper.scaleY(value);
+    super.setScaleY(value);
   }
 
 
-  @NonNull
-  static void matrix(Matrix matrix, @NonNull PointF src, @NonNull PointF dst) {
-
-      final float
-        sw = src.x,
-        sh = src.y,
-        dw = dst.x,
-        dh = dst.y;
-
-      float scale, dx = 0, dy = 0;
-
-      if (sw * dh > dw * sh) {
-        scale = dh / sh;
-        dx = (dw - sw * scale) * 0.5f;
-      } else {
-        scale = dw / sw;
-        dy = (dh - sh * scale) * 0.5f;
-      }
-
-
-      matrix.setScale(scale, scale);
-      matrix.postTranslate(dx, dy);
-
-    System.out.println("PlayerTextureView.matrix " + scale);
-    System.out.println("PlayerTextureView.matrix " + dx + " " + dy);
-  }
-
-  /**
-   * @param bitmap picture bitmap
-   * @param bounds picture bounds
-   *
-   * @return fit matrix
-   */
-  @NonNull
-  static Matrix matrix
-  (@NonNull Bitmap bitmap, @NonNull RectF bounds) {
-    return new Matrix() {{
-      final float
-        sw = bitmap.getWidth(),
-        sh = bitmap.getHeight(),
-        dw = bounds.width(),
-        dh = bounds.height();
-
-      float scale, dx = 0, dy = 0;
-
-      if (sw * dh > dw * sh) {
-        scale = dh / sh;
-        dx = (dw - sw * scale) * 0.5f;
-      } else {
-        scale = dw / sw;
-        dy = (dh - sh * scale) * 0.5f;
-      }
-
-      setScale(scale, scale);
-      postTranslate(dx, dy);
-    }};
-  }
 }

@@ -102,7 +102,8 @@ public class Utils {
       @SuppressWarnings("NullableProblems")
       @Override
       public final RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
-        return new RecyclerView.ViewHolder(inflater.inflate(type, parent, false)) {
+        View inflate = inflater.inflate(type, parent, false);
+        return new RecyclerView.ViewHolder(inflate) {
         };
       }
 

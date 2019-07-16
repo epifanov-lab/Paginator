@@ -17,7 +17,7 @@
     <com.example.paginationpolygon.pagination.PlayerTextureView
         android:id="@+id/texture"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
     <RelativeLayout
         android:id="@+id/container_ui"
